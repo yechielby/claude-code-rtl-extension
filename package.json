@@ -29,6 +29,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "icon": "claude-code-rtl-logo.png",
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

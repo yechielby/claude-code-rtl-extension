@@ -5,9 +5,11 @@ import { addRtl, addRtlAlways, addRtlAuto, removeRtl, fixBidi, getStatus } from 
 import { createStatusBarItem, updateStatusBar, disposeStatusBar } from './statusBar.js';
 
 const STATE_MODE_KEY = 'rtl.mode';
+const STATE_VERSION_KEY = 'rtl.version';
 
 let outputChannel: vscode.OutputChannel;
 let globalState: vscode.Memento;
+let currentVersion: string;
 
 function getOutputChannel(): vscode.OutputChannel {
     if (!outputChannel) {
@@ -135,19 +137,62 @@ async function silentInject(extensions: ClaudeExtensionInfo[], action: Injection
     return anyChanged;
 }
 
+async function saveVersion(): Promise<void> {
+    await globalState.update(STATE_VERSION_KEY, currentVersion);
+}
+
+/**
+ * Detect the active RTL mode from file contents.
+ * Returns the mode of the first extension that has RTL installed,
+ * or 'inactive' if none found.
+ */
+async function detectModeFromFiles(extensions: ClaudeExtensionInfo[]): Promise<RtlMode> {
+    const statuses = await getStatus(extensions);
+    for (const s of statuses) {
+        if (s.mode !== 'inactive') return s.mode;
+    }
+    return 'inactive';
+}
+
 /**
  * Auto-reactivate RTL if needed.
  * Runs silently on every activation to ensure RTL stays injected
  * even after Claude Code updates replace the files.
  */
 async function autoReactivate(): Promise<void> {
+    const savedVersion = globalState.get<string>(STATE_VERSION_KEY);
     const savedMode = getSavedMode();
-    const isFirstInstall = globalState.get<string>(STATE_MODE_KEY) === undefined;
+    const hasModeKey = globalState.get<string>(STATE_MODE_KEY) !== undefined;
 
-    // First install — activate as 'active' automatically
-    if (isFirstInstall) {
-        await saveMode('active');
+    // ── First install (no version ever saved) ─────────────────────
+    if (!savedVersion) {
         const extensions = await findClaudeExtensions();
+
+        // Upgrade from old version that didn't save version:
+        // detect mode from existing files to preserve user's choice
+        if (extensions.length > 0) {
+            const detectedMode = await detectModeFromFiles(extensions);
+            if (detectedMode !== 'inactive') {
+                await saveMode(detectedMode);
+                await saveVersion();
+                // Re-inject with latest code
+                const action = MODE_ACTIONS[detectedMode];
+                if (action && await silentInject(extensions, action)) {
+                    vscode.commands.executeCommand('workbench.action.reloadWindow');
+                }
+                return;
+            }
+        }
+
+        // User had explicitly deactivated in old version
+        if (hasModeKey && savedMode === 'inactive') {
+            await saveVersion();
+            return;
+        }
+
+        // True first install — auto-activate
+        await saveMode('active');
+        await saveVersion();
         if (extensions.length === 0) return;
 
         if (await silentInject(extensions, addRtl)) {
@@ -156,6 +201,23 @@ async function autoReactivate(): Promise<void> {
         return;
     }
 
+    // ── Version upgrade ───────────────────────────────────────────
+    if (savedVersion !== currentVersion) {
+        await saveVersion();
+        // Re-inject to apply updated code, respecting saved mode
+        if (savedMode === 'inactive') return;
+
+        const extensions = await findClaudeExtensions();
+        if (extensions.length === 0) return;
+
+        const action = MODE_ACTIONS[savedMode];
+        if (action && await silentInject(extensions, action)) {
+            vscode.commands.executeCommand('workbench.action.reloadWindow');
+        }
+        return;
+    }
+
+    // ── Same version — only re-inject if Claude Code overwrote files ─
     if (savedMode === 'inactive') return;
 
     const extensions = await findClaudeExtensions();
@@ -173,6 +235,7 @@ async function autoReactivate(): Promise<void> {
 
 export function activate(context: vscode.ExtensionContext): void {
     globalState = context.globalState;
+    currentVersion = context.extension.packageJSON.version ?? '0.0.0';
 
     const statusBar = createStatusBarItem();
     context.subscriptions.push(statusBar);

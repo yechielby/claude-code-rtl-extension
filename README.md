@@ -43,7 +43,7 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 
 ---
 
-### 🆕 What's New (v0.3.1)
+### 🆕 What's New (v0.3.5)
 
 - **Auto RTL mode** — A new intelligent mode that auto-detects Hebrew, Arabic, and Persian text per chat bubble using a MutationObserver. Only bubbles containing RTL text get right-to-left direction — English-only bubbles stay LTR. No manual toggling needed.
 
@@ -231,7 +231,7 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-### 🆕 מה חדש (v0.3.1)
+### 🆕 מה חדש (v0.3.5)
 
 - **מצב RTL אוטומטי** — מצב חכם חדש שמזהה אוטומטית טקסט בעברית, ערבית ופרסית לכל בועת צ'אט באמצעות MutationObserver. רק בועות שמכילות טקסט RTL מקבלות כיווניות מימין לשמאל — בועות באנגלית בלבד נשארות LTR. ללא צורך בהחלפה ידנית.
 
@@ -423,7 +423,7 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 
 ---
 
-### 🆕 ما الجديد (v0.3.1)
+### 🆕 ما الجديد (v0.3.5)
 
 - **وضع RTL التلقائي** — وضع ذكي جديد يكتشف تلقائيًا النص العربي والعبري والفارسي لكل فقاعة محادثة باستخدام MutationObserver. الفقاعات التي تحتوي على نص RTL فقط تحصل على اتجاه من اليمين إلى اليسار — الفقاعات الإنجليزية تبقى LTR. لا حاجة للتبديل اليدوي.
 
@@ -615,7 +615,7 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 
 ---
 
-### 🆕 تازه‌ها (v0.3.1)
+### 🆕 تازه‌ها (v0.3.5)
 
 - **حالت RTL خودکار** — حالت هوشمند جدیدی که به‌طور خودکار متن فارسی، عربی و عبری را در هر حباب چت با استفاده از MutationObserver شناسایی می‌کند. فقط حباب‌هایی که متن RTL دارند جهت راست به چپ می‌گیرند — حباب‌های انگلیسی LTR باقی می‌مانند. بدون نیاز به تغییر دستی.
 

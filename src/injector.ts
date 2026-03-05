@@ -173,9 +173,15 @@ export async function getStatus(extensions: ClaudeExtensionInfo[]): Promise<RtlS
     const statuses: RtlStatus[] = [];
 
     for (const ext of extensions) {
-        const cssInstalled = await isCssInstalled(ext.cssPath);
-        const autoMode = cssInstalled && await isAutoMode(ext.cssPath);
-        const alwaysMode = !autoMode && cssInstalled && await isAlwaysMode(ext.cssPath);
+        let cssContent = '';
+        try {
+            cssContent = await fs.readFile(ext.cssPath, 'utf-8');
+        } catch { /* file unreadable — treat as not installed */ }
+
+        const cssInstalled = cssContent.includes(RTL_START_MARKER);
+        const autoMode = cssInstalled && cssContent.includes(RTL_MODE_AUTO_MARKER);
+        const alwaysMode = cssInstalled && !autoMode && cssContent.includes(RTL_MODE_ALWAYS_MARKER);
+
         statuses.push({
             extension: ext,
             cssInstalled,

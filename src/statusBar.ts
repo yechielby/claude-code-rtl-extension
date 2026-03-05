@@ -26,10 +26,14 @@ export async function updateStatusBar(): Promise<void> {
     }
 
     const statuses = await getStatus(extensions);
+    const autoMode = statuses.some(s => s.mode === 'auto');
     const alwaysMode = statuses.some(s => s.mode === 'always');
     const activeMode = statuses.some(s => s.mode === 'active');
 
-    if (alwaysMode) {
+    if (autoMode) {
+        statusBarItem.text = '$(globe) RTL: Auto';
+        statusBarItem.tooltip = 'Claude Code RTL auto-detects Hebrew. Click to manage.';
+    } else if (alwaysMode) {
         statusBarItem.text = '$(globe) RTL: Always';
         statusBarItem.tooltip = 'Claude Code RTL is always on. Click to manage.';
     } else if (activeMode) {

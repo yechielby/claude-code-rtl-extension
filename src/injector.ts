@@ -4,8 +4,9 @@ import {
     RTL_CSS_RULES, RTL_JS_CODE,
     RTL_START_MARKER, RTL_END_MARKER,
     JS_START_MARKER, JS_END_MARKER,
-    RTL_MODE_ALWAYS_MARKER,
-    generateAlwaysCssRules,
+    RTL_MODE_ALWAYS_MARKER, RTL_MODE_AUTO_MARKER,
+    RTL_AUTO_JS_CODE,
+    generateAlwaysCssRules, generateAutoCssRules,
 } from './content.js';
 
 /**
@@ -39,6 +40,18 @@ export async function isAlwaysMode(cssPath: string): Promise<boolean> {
     try {
         const content = await fs.readFile(cssPath, 'utf-8');
         return content.includes(RTL_MODE_ALWAYS_MARKER);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Check if CSS is in "auto" mode (per-element Hebrew detection).
+ */
+export async function isAutoMode(cssPath: string): Promise<boolean> {
+    try {
+        const content = await fs.readFile(cssPath, 'utf-8');
+        return content.includes(RTL_MODE_AUTO_MARKER);
     } catch {
         return false;
     }
@@ -85,14 +98,15 @@ export async function getStatus(extensions: ClaudeExtensionInfo[]): Promise<RtlS
 
     for (const ext of extensions) {
         const cssInstalled = await isCssInstalled(ext.cssPath);
-        const alwaysMode = cssInstalled && await isAlwaysMode(ext.cssPath);
+        const autoMode = cssInstalled && await isAutoMode(ext.cssPath);
+        const alwaysMode = !autoMode && cssInstalled && await isAlwaysMode(ext.cssPath);
         statuses.push({
             extension: ext,
             cssInstalled,
             jsInstalled: await isJsInstalled(ext.jsPath),
             cssBackupExists: await exists(ext.cssPath + '.bak'),
             jsBackupExists: ext.jsPath ? await exists(ext.jsPath + '.bak') : false,
-            mode: alwaysMode ? 'always' : cssInstalled ? 'active' : 'inactive',
+            mode: autoMode ? 'auto' : alwaysMode ? 'always' : cssInstalled ? 'active' : 'inactive',
         });
     }
 
@@ -191,7 +205,14 @@ export async function addRtlAlways(ext: ClaudeExtensionInfo): Promise<{ messages
             messages.push(`  CSS: Backup created: ${backupPath}`);
         }
 
-        const content = await fs.readFile(ext.cssPath, 'utf-8');
+        let content = await fs.readFile(ext.cssPath, 'utf-8');
+
+        // Fix bidi-override if present (some Claude Code versions have this)
+        if (content.includes(BIDI_OVERRIDE)) {
+            content = content.replace(BIDI_OVERRIDE, '');
+            messages.push(`  CSS: Removed bidi-override rule`);
+        }
+
         await fs.writeFile(ext.cssPath, content + '\n' + generateAlwaysCssRules(), 'utf-8');
         messages.push(`  CSS: RTL Always support added to ${ext.name}`);
         changed = true;
@@ -225,6 +246,81 @@ export async function addRtlAlways(ext: ClaudeExtensionInfo): Promise<{ messages
     return { messages, changed };
 }
 
+/**
+ * Add RTL "Auto" mode — per-element Hebrew detection via JS MutationObserver.
+ * CSS sets up plaintext bidi, JS sets direction based on Hebrew character presence.
+ */
+export async function addRtlAuto(ext: ClaudeExtensionInfo): Promise<{ messages: string[]; changed: boolean }> {
+    const messages: string[] = [];
+    let changed = false;
+
+    // --- CSS: restore from backup and inject "auto" version ---
+    try {
+        const backupPath = ext.cssPath + '.bak';
+
+        if (await exists(backupPath)) {
+            await fs.copyFile(backupPath, ext.cssPath);
+            messages.push(`  CSS: Restored from backup`);
+        } else {
+            await fs.copyFile(ext.cssPath, backupPath);
+            messages.push(`  CSS: Backup created: ${backupPath}`);
+        }
+
+        let content = await fs.readFile(ext.cssPath, 'utf-8');
+
+        // Fix bidi-override if present (some Claude Code versions have this)
+        if (content.includes(BIDI_OVERRIDE)) {
+            content = content.replace(BIDI_OVERRIDE, '');
+            messages.push(`  CSS: Removed bidi-override rule`);
+        }
+
+        await fs.writeFile(ext.cssPath, content + '\n' + generateAutoCssRules(), 'utf-8');
+        messages.push(`  CSS: RTL Auto support added to ${ext.name}`);
+        changed = true;
+    } catch (e: unknown) {
+        const err = e as NodeJS.ErrnoException;
+        if (err.code === 'EPERM' || err.code === 'EACCES') {
+            messages.push(`  CSS: Permission denied: ${ext.cssPath}`);
+            messages.push('       Try running with elevated privileges');
+        } else {
+            messages.push(`  CSS: Error: ${err.message}`);
+        }
+    }
+
+    // --- JS: restore from backup and inject auto-detection script ---
+    if (!ext.jsPath) {
+        messages.push('  JS:  index.js not found, skipping auto-detection injection');
+        return { messages, changed };
+    }
+
+    try {
+        const backupPath = ext.jsPath + '.bak';
+
+        if (await exists(backupPath)) {
+            await fs.copyFile(backupPath, ext.jsPath);
+            messages.push(`  JS:  Restored from backup`);
+        } else {
+            await fs.copyFile(ext.jsPath, backupPath);
+            messages.push(`  JS:  Backup created: ${backupPath}`);
+        }
+
+        const content = await fs.readFile(ext.jsPath, 'utf-8');
+        await fs.writeFile(ext.jsPath, content + '\n' + RTL_AUTO_JS_CODE, 'utf-8');
+        messages.push(`  JS:  Auto-detection script added to ${ext.name}`);
+        changed = true;
+    } catch (e: unknown) {
+        const err = e as NodeJS.ErrnoException;
+        if (err.code === 'EPERM' || err.code === 'EACCES') {
+            messages.push(`  JS:  Permission denied: ${ext.jsPath}`);
+            messages.push('       Try running with elevated privileges');
+        } else {
+            messages.push(`  JS:  Error: ${err.message}`);
+        }
+    }
+
+    return { messages, changed };
+}
+
 const BIDI_OVERRIDE = '*{direction:ltr;unicode-bidi:bidi-override}';
 
 /**
@@ -232,8 +328,9 @@ const BIDI_OVERRIDE = '*{direction:ltr;unicode-bidi:bidi-override}';
  * Preserves the current mode: if in Always mode stays Always, otherwise uses Active.
  */
 export async function fixBidi(ext: ClaudeExtensionInfo): Promise<{ messages: string[]; changed: boolean }> {
-    const currentlyAlways = await isAlwaysMode(ext.cssPath);
-    const result = currentlyAlways ? await addRtlAlways(ext) : await addRtl(ext);
+    const currentlyAuto = await isAutoMode(ext.cssPath);
+    const currentlyAlways = !currentlyAuto && await isAlwaysMode(ext.cssPath);
+    const result = currentlyAuto ? await addRtlAuto(ext) : currentlyAlways ? await addRtlAlways(ext) : await addRtl(ext);
 
     // After injection, remove the bidi-override rule from the CSS file
     try {

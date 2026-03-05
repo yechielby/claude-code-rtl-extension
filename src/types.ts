@@ -11,7 +11,7 @@ export interface ClaudeExtensionInfo {
 }
 
 /** RTL operating mode */
-export type RtlMode = 'active' | 'always' | 'inactive';
+export type RtlMode = 'active' | 'always' | 'auto' | 'inactive';
 
 /** RTL installation status for a single extension */
 export interface RtlStatus {

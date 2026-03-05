@@ -15,6 +15,7 @@ export const JS_END_MARKER = '/* End RTL Toggle Button */';
 /** Marker to identify RTL mode inside injected CSS */
 export const RTL_MODE_ACTIVE_MARKER = '/* RTL-MODE: active */';
 export const RTL_MODE_ALWAYS_MARKER = '/* RTL-MODE: always */';
+export const RTL_MODE_AUTO_MARKER = '/* RTL-MODE: auto */';
 
 /** RTL CSS rules to inject — identical to Python RTL_CSS_RULES */
 export const RTL_CSS_RULES = `
@@ -98,6 +99,12 @@ export const RTL_CSS_RULES = `
     unicode-bidi: plaintext;
 }
 
+/* Prompt input — auto-detect direction by first character */
+.YBYrtl [class*="messageInput_"] {
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+
 /* ==========================================
    LTR overrides - Code, Tools, UI
    ========================================== */
@@ -112,7 +119,6 @@ export const RTL_CSS_RULES = `
 .YBYrtl [class*="dotWarning_"],
 .YBYrtl [class*="progressContent_"],
 .YBYrtl [class*="inputContainer_"][class*="cKsPxg"],
-.YBYrtl [class*="messageInput_"],
 .YBYrtl [class*="inputWrapper_"],
 .YBYrtl [class*="iconButton_"],
 .YBYrtl [class*="copyButton_"],
@@ -218,14 +224,71 @@ export const RTL_JS_CODE = `
 /* End RTL Toggle Button */
 `;
 
+/** Auto-mode JS — scans bubbles for Hebrew and adds .YBYrtl class.
+ *  CSS (with .YBYrtl prefix) handles the rest. */
+export const RTL_AUTO_JS_CODE = `
+/* RTL Toggle Button - Added by script */
+(function() {
+    var RTL = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+    var CLS = 'YBYrtl';
+
+    /* Bubble selectors — Claude responses and user messages */
+    var BUBBLE_SEL = '[class*="timelineMessage_"],[class*="userMessageContainer_"]';
+
+    /* Watch a single bubble — add .YBYrtl when RTL text is found, then stop watching */
+    function watchBubble(el) {
+        if (!el.matches || !el.matches(BUBBLE_SEL)) return;
+        if (el.classList.contains(CLS)) return;
+
+        /* Check immediately */
+        if (RTL.test(el.textContent || '')) {
+            el.classList.add(CLS);
+            return;
+        }
+
+        /* Not found yet — observe this bubble for changes */
+        var obs = new MutationObserver(function() {
+            if (RTL.test(el.textContent || '')) {
+                el.classList.add(CLS);
+                obs.disconnect();
+            }
+        });
+        obs.observe(el, { childList: true, subtree: true, characterData: true });
+    }
+
+    var root = document.getElementById('root');
+    if (!root) return;
+
+    /* Initial scan */
+    root.querySelectorAll(BUBBLE_SEL).forEach(watchBubble);
+
+    /* Watch for new bubbles appearing */
+    new MutationObserver(function(muts) {
+        for (var i = 0; i < muts.length; i++) {
+            var m = muts[i];
+            for (var j = 0; j < m.addedNodes.length; j++) {
+                var nd = m.addedNodes[j];
+                if (nd.nodeType !== 1) continue;
+                if (nd.matches) watchBubble(nd);
+                if (nd.querySelectorAll) {
+                    nd.querySelectorAll(BUBBLE_SEL).forEach(watchBubble);
+                }
+            }
+        }
+    }).observe(root, { childList: true, subtree: true });
+})();
+/* End RTL Toggle Button */
+`;
+
 /**
- * Generate CSS rules for "Always" mode — no `.YBYrtl` class dependency, no button styles.
+ * Generate CSS rules without `.YBYrtl` class dependency and no button styles.
+ * Used by both "Always" and "Auto" modes — only the marker differs.
  */
-export function generateAlwaysCssRules(): string {
+function generateBaseCssRules(modeMarker: string): string {
     let css = RTL_CSS_RULES;
 
     // Replace mode marker
-    css = css.replace(RTL_MODE_ACTIVE_MARKER, RTL_MODE_ALWAYS_MARKER);
+    css = css.replace(RTL_MODE_ACTIVE_MARKER, modeMarker);
 
     // Remove button styling section
     css = css.replace(
@@ -235,6 +298,70 @@ export function generateAlwaysCssRules(): string {
 
     // Remove `.YBYrtl ` prefix from all selectors
     css = css.replace(/\.YBYrtl\s+/g, '');
+
+    return css;
+}
+
+/**
+ * Generate CSS rules for "Always" mode.
+ */
+export function generateAlwaysCssRules(): string {
+    return generateBaseCssRules(RTL_MODE_ALWAYS_MARKER);
+}
+
+/**
+ * Generate CSS rules for "Auto" mode — keeps `.YBYrtl` prefix (like Active),
+ * removes button styles and messagesContainer rule.
+ * JS will add `.YBYrtl` class per-bubble based on Hebrew detection.
+ */
+export function generateAutoCssRules(): string {
+    let css = RTL_CSS_RULES;
+
+    // Replace mode marker
+    css = css.replace(RTL_MODE_ACTIVE_MARKER, RTL_MODE_AUTO_MARKER);
+
+    // Remove button styling section
+    css = css.replace(
+        /\/\* =+\s*\n\s*Toggle button - always visible\s*\n\s*=+ \*\/[\s\S]*?#yby-rtl-btn\.yby-active\s*\{[^}]*\}/,
+        '',
+    );
+
+    // Remove messagesContainer rule (not needed — .YBYrtl is on individual bubbles, not on root)
+    css = css.replace(
+        /\.YBYrtl\s+\[class\*="messagesContainer_"\]\s*\{[^}]*\}\s*/,
+        '',
+    );
+
+    // Add self-matching rules (no space) for elements where .YBYrtl is on the same element
+    // In Auto mode, .YBYrtl is added directly to the bubble, not to #root
+    css += `
+/* Auto mode — self-matching rules for .YBYrtl on the bubble itself */
+.YBYrtl[class*="userMessage_"],
+.YBYrtl[class*="userMessageContainer_"] {
+    direction: rtl;
+    unicode-bidi: plaintext;
+    text-align: right !important;
+    align-items: flex-end !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+.YBYrtl[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) {
+    direction: rtl;
+    unicode-bidi: plaintext;
+}
+
+.YBYrtl[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) > :is(p, ul, ol, h1, h2, h3, h4, blockquote),
+.YBYrtl[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) > :is(ul, ol) li {
+    text-align: right;
+}
+
+/* Prompt input — no .YBYrtl ancestor in Auto mode, so target directly */
+[class*="messageInput_"] {
+    unicode-bidi: plaintext;
+    text-align: start;
+}
+`;
 
     return css;
 }

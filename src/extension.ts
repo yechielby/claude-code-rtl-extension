@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { RtlMode } from './types.js';
 import { findClaudeExtensions } from './finder.js';
-import { addRtl, addRtlAlways, removeRtl, fixBidi, getStatus } from './injector.js';
+import { addRtl, addRtlAlways, addRtlAuto, removeRtl, fixBidi, getStatus } from './injector.js';
 import { createStatusBarItem, updateStatusBar, disposeStatusBar } from './statusBar.js';
 
 const STATE_MODE_KEY = 'rtl.mode';
@@ -70,6 +70,32 @@ async function handleAddAlways(): Promise<void> {
 
     channel.show(true);
     await saveMode('always');
+
+    if (anyChanged) {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
+}
+
+async function handleAddAuto(): Promise<void> {
+    const extensions = await findClaudeExtensions();
+    if (extensions.length === 0) {
+        vscode.window.showWarningMessage('No Claude Code extensions found.');
+        return;
+    }
+
+    const channel = getOutputChannel();
+    channel.clear();
+    channel.appendLine('Activating RTL Auto mode...\n');
+
+    let anyChanged = false;
+    for (const ext of extensions) {
+        const result = await addRtlAuto(ext);
+        result.messages.forEach(m => channel.appendLine(m));
+        if (result.changed) anyChanged = true;
+    }
+
+    channel.show(true);
+    await saveMode('auto');
 
     if (anyChanged) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
@@ -166,6 +192,7 @@ async function handleShowMenu(): Promise<void> {
     const items: vscode.QuickPickItem[] = [
         { label: '$(check) Activate RTL', description: 'Enable RTL support with toggle button' },
         { label: '$(pin) Activate RTL (Always)', description: 'Enable RTL permanently without toggle button' },
+        { label: '$(eye) Activate RTL (Auto)', description: 'Auto-detect Hebrew per paragraph and set direction' },
         { label: '$(tools) Fix BiDi', description: 'Activate RTL and fix bidirectional text issues' },
         { label: '$(close) Deactivate RTL', description: 'Disable RTL support and restore original files' },
         { label: '$(info) Check Status', description: 'Show current RTL status' },
@@ -177,7 +204,9 @@ async function handleShowMenu(): Promise<void> {
 
     if (!selection) return;
 
-    if (selection.label.includes('Always')) {
+    if (selection.label.includes('Auto')) {
+        vscode.commands.executeCommand('claude-rtl.addAuto');
+    } else if (selection.label.includes('Always')) {
         vscode.commands.executeCommand('claude-rtl.addAlways');
     } else if (selection.label.includes('Activate')) {
         vscode.commands.executeCommand('claude-rtl.add');
@@ -229,7 +258,9 @@ async function autoReactivate(): Promise<void> {
     // Silently re-inject based on saved mode
     let anyChanged = false;
     for (const ext of extensions) {
-        const result = savedMode === 'always'
+        const result = savedMode === 'auto'
+            ? await addRtlAuto(ext)
+            : savedMode === 'always'
             ? await addRtlAlways(ext)
             : await addRtl(ext);
         if (result.changed) anyChanged = true;
@@ -249,6 +280,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('claude-rtl.add', handleAdd),
         vscode.commands.registerCommand('claude-rtl.addAlways', handleAddAlways),
+        vscode.commands.registerCommand('claude-rtl.addAuto', handleAddAuto),
         vscode.commands.registerCommand('claude-rtl.fixBidi', handleFixBidi),
         vscode.commands.registerCommand('claude-rtl.remove', handleRemove),
         vscode.commands.registerCommand('claude-rtl.status', handleStatus),

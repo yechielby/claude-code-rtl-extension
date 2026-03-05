@@ -34,6 +34,7 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 |---|---|
 | ▶️ Activate RTL | Injects CSS and a toggle button into the Claude Code chat |
 | 📌 Activate RTL (Always) | Permanently enables RTL without a toggle button |
+| 👁️ Activate RTL (Auto) | Auto-detects Hebrew/Arabic/Persian per bubble and sets direction |
 | 🔧 Fix BiDi | Activates RTL and fixes reversed text (e.g. "םולש" → "שלום") |
 | ⏹️ Deactivate RTL | Restores original files from backup |
 | 🔍 Check Status | Shows which installations have RTL enabled |
@@ -42,7 +43,11 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 
 ---
 
-### 🆕 What's New (v0.3.0)
+### 🆕 What's New (v0.3.1)
+
+- **Auto RTL mode** — A new intelligent mode that auto-detects Hebrew, Arabic, and Persian text per chat bubble using a MutationObserver. Only bubbles containing RTL text get right-to-left direction — English-only bubbles stay LTR. No manual toggling needed.
+
+### Previous (v0.3.0)
 
 - **Always RTL mode** — A new mode that permanently enables RTL without needing the toggle button. CSS is injected directly without class dependency, so RTL is always active. Switch between modes via the status bar menu or command palette.
 - **Auto-reactivate** — RTL is automatically restored when Claude Code updates replace its files. No need to manually re-activate.
@@ -79,6 +84,7 @@ After installation, a status bar item appears at the bottom of VS Code:
 |---|---|
 | `RTL: Active` ✅ | RTL is injected with toggle button |
 | `RTL: Always` 📌 | RTL is permanently on (no toggle needed) |
+| `RTL: Auto` 👁️ | RTL auto-detects per bubble |
 | `RTL: Inactive` ⭕ | RTL is not installed |
 | `RTL: N/A` ❌ | Claude Code for VS Code extension not found |
 
@@ -92,6 +98,7 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 |---|---|
 | `Claude RTL: Activate RTL` | ▶️ Enable RTL support with toggle button |
 | `Claude RTL: Activate RTL (Always)` | 📌 Enable RTL permanently without toggle button |
+| `Claude RTL: Activate RTL (Auto)` | 👁️ Auto-detect RTL per bubble |
 | `Claude RTL: Fix BiDi` | 🔧 Activate RTL + fix bidirectional text issues |
 | `Claude RTL: Deactivate RTL` | ⏹️ Disable RTL and restore original files |
 | `Claude RTL: Check Status` | 🔍 View installation status |
@@ -109,10 +116,14 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 
 **Always mode** — RTL is permanently on. No button needed — text is always right-to-left.
 
+**Auto mode** — RTL is automatically detected per chat bubble. Bubbles with Hebrew/Arabic/Persian text become RTL; English-only bubbles stay LTR. Best for mixed-language conversations.
+
 > 💡 **Tip (Active mode):** Not every conversation needs RTL — you can toggle it per chat session.
 > Use ⇄ only in conversations where you write in Hebrew, Arabic, or Persian.
 
 > 💡 **Tip (Always mode):** Use this if you always write in Hebrew, Arabic, or Persian and don't want to toggle each time.
+
+> 💡 **Tip (Auto mode):** Best for mixed conversations — each bubble gets the right direction automatically.
 
 > 🔄 **Auto-reactivate:** If Claude Code updates and replaces its files, RTL is automatically restored on the next startup.
 
@@ -211,6 +222,7 @@ MIT — see [LICENSE](LICENSE) for details.
 |---|---|
 | ▶️ הפעלת RTL | מזריק עיצוב CSS וכפתור מתג לממשק הצ'אט |
 | 📌 הפעלת RTL (תמיד) | מפעיל RTL לצמיתות ללא כפתור מתג |
+| 👁️ הפעלת RTL (אוטו) | מזהה אוטומטית עברית/ערבית/פרסית לכל בועה וקובע כיוון |
 | 🔧 תיקון BiDi | מפעיל RTL ומתקן טקסט הפוך (למשל "םולש" → "שלום") |
 | ⏹️ כיבוי RTL | משחזר קבצים מקוריים מגיבוי |
 | 🔍 בדיקת סטטוס | מציג אילו התקנות פועלות עם RTL |
@@ -219,7 +231,11 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-### 🆕 מה חדש (v0.3.0)
+### 🆕 מה חדש (v0.3.1)
+
+- **מצב RTL אוטומטי** — מצב חכם חדש שמזהה אוטומטית טקסט בעברית, ערבית ופרסית לכל בועת צ'אט באמצעות MutationObserver. רק בועות שמכילות טקסט RTL מקבלות כיווניות מימין לשמאל — בועות באנגלית בלבד נשארות LTR. ללא צורך בהחלפה ידנית.
+
+### גרסה קודמת (v0.3.0)
 
 - **מצב RTL תמידי** — מצב חדש שמפעיל RTL לצמיתות ללא צורך בכפתור מתג. ה-CSS מוזרק ישירות ללא תלות ב-class, כך ש-RTL תמיד פעיל. ניתן לעבור בין מצבים דרך תפריט שורת המצב או לוח הפקודות.
 - **הפעלה מחדש אוטומטית** — RTL משוחזר אוטומטית כאשר עדכון Claude Code מחליף את הקבצים. אין צורך להפעיל ידנית מחדש.
@@ -256,6 +272,7 @@ MIT — see [LICENSE](LICENSE) for details.
 |---|---|
 | `RTL: Active` ✅ | RTL מופעל עם כפתור מתג |
 | `RTL: Always` 📌 | RTL פעיל תמיד (ללא כפתור) |
+| `RTL: Auto` 👁️ | RTL מזהה אוטומטית לכל בועה |
 | `RTL: Inactive` ⭕ | RTL לא מותקן |
 | `RTL: N/A` ❌ | התוסף לא נמצא |
 
@@ -269,6 +286,7 @@ MIT — see [LICENSE](LICENSE) for details.
 |---|---|
 | `Claude RTL: Activate RTL` | ▶️ הפעלת תמיכת RTL עם כפתור מתג |
 | `Claude RTL: Activate RTL (Always)` | 📌 הפעלת RTL לצמיתות ללא כפתור מתג |
+| `Claude RTL: Activate RTL (Auto)` | 👁️ זיהוי אוטומטי של RTL לכל בועה |
 | `Claude RTL: Fix BiDi` | 🔧 הפעלת RTL + תיקון בעיות טקסט דו-כיווני |
 | `Claude RTL: Deactivate RTL` | ⏹️ כיבוי ושחזור קבצים מקוריים |
 | `Claude RTL: Check Status` | 🔍 הצגת מצב ההתקנה |
@@ -286,10 +304,14 @@ MIT — see [LICENSE](LICENSE) for details.
 
 **מצב Always** — RTL פעיל תמיד. אין צורך בכפתור — הטקסט תמיד מימין לשמאל.
 
+**מצב Auto** — RTL מזוהה אוטומטית לכל בועת צ'אט. בועות עם עברית/ערבית/פרסית הופכות ל-RTL; בועות באנגלית בלבד נשארות LTR. מתאים לשיחות בשפות מעורבות.
+
 > 💡 **טיפ (מצב Active):** לא כל שיחה צריכה RTL — ניתן להחליט לכל שיחה בנפרד.
 > לחץ ⇄ רק בשיחות שבהן אתה כותב בעברית, ערבית או פרסית.
 
 > 💡 **טיפ (מצב Always):** השתמש במצב זה אם אתה תמיד כותב בעברית, ערבית או פרסית ולא רוצה לעשות מתג בכל פעם.
+
+> 💡 **טיפ (מצב Auto):** מתאים לשיחות מעורבות — כל בועה מקבלת את הכיוון הנכון אוטומטית.
 
 > 🔄 **הפעלה מחדש אוטומטית:** אם Claude Code מתעדכן ומחליף את הקבצים, RTL משוחזר אוטומטית בהפעלה הבאה.
 
@@ -392,6 +414,7 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 |---|---|
 | ▶️ تفعيل RTL | تحقن تنسيقات CSS وزر تبديل في واجهة المحادثة |
 | 📌 تفعيل RTL (دائم) | تفعيل RTL بشكل دائم بدون زر تبديل |
+| 👁️ تفعيل RTL (تلقائي) | كشف تلقائي للعربية/العبرية/الفارسية لكل فقاعة وتحديد الاتجاه |
 | 🔧 إصلاح BiDi | تفعيل RTL وإصلاح النص المعكوس (مثل "ملاس" → "سلام") |
 | ⏹️ إيقاف RTL | تستعيد الملفات الأصلية من النسخ الاحتياطية |
 | 🔍 فحص الحالة | يعرض التثبيتات التي تعمل بـ RTL |
@@ -400,7 +423,11 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 
 ---
 
-### 🆕 ما الجديد (v0.3.0)
+### 🆕 ما الجديد (v0.3.1)
+
+- **وضع RTL التلقائي** — وضع ذكي جديد يكتشف تلقائيًا النص العربي والعبري والفارسي لكل فقاعة محادثة باستخدام MutationObserver. الفقاعات التي تحتوي على نص RTL فقط تحصل على اتجاه من اليمين إلى اليسار — الفقاعات الإنجليزية تبقى LTR. لا حاجة للتبديل اليدوي.
+
+### السابق (v0.3.0)
 
 - **وضع RTL الدائم** — وضع جديد يفعّل RTL بشكل دائم بدون الحاجة لزر التبديل. يتم حقن CSS مباشرة بدون اعتماد على class، لذا RTL يكون دائمًا نشطًا. يمكنك التبديل بين الأوضاع عبر قائمة شريط الحالة أو لوحة الأوامر.
 - **إعادة تفعيل تلقائية** — يتم استعادة RTL تلقائيًا عندما يقوم تحديث Claude Code باستبدال ملفاته. لا حاجة لإعادة التفعيل يدويًا.
@@ -437,6 +464,7 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 |---|---|
 | `RTL: Active` ✅ | RTL مفعّل مع زر تبديل |
 | `RTL: Always` 📌 | RTL نشط دائمًا (بدون زر) |
+| `RTL: Auto` 👁️ | RTL يكتشف تلقائيًا لكل فقاعة |
 | `RTL: Inactive` ⭕ | RTL غير مثبت |
 | `RTL: N/A` ❌ | الإضافة غير موجودة |
 
@@ -450,6 +478,7 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 |---|---|
 | `Claude RTL: Activate RTL` | ▶️ تفعيل دعم RTL مع زر تبديل |
 | `Claude RTL: Activate RTL (Always)` | 📌 تفعيل RTL بشكل دائم بدون زر تبديل |
+| `Claude RTL: Activate RTL (Auto)` | 👁️ كشف تلقائي لـ RTL لكل فقاعة |
 | `Claude RTL: Fix BiDi` | 🔧 تفعيل RTL + إصلاح مشاكل النص ثنائي الاتجاه |
 | `Claude RTL: Deactivate RTL` | ⏹️ إيقاف الدعم واستعادة الملفات الأصلية |
 | `Claude RTL: Check Status` | 🔍 عرض حالة التثبيت |
@@ -467,10 +496,14 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 
 **وضع Always** — RTL نشط دائمًا. لا حاجة لزر — النص دائمًا من اليمين إلى اليسار.
 
+**وضع Auto** — يتم اكتشاف RTL تلقائيًا لكل فقاعة محادثة. الفقاعات التي تحتوي على عربية/عبرية/فارسية تصبح RTL؛ الفقاعات الإنجليزية تبقى LTR. مثالي للمحادثات متعددة اللغات.
+
 > 💡 **نصيحة (وضع Active):** ليست كل المحادثات تحتاج RTL — يمكنك تفعيله لكل محادثة على حدة.
 > استخدم ⇄ فقط في المحادثات التي تكتب فيها بالعربية أو العبرية أو الفارسية.
 
 > 💡 **نصيحة (وضع Always):** استخدم هذا الوضع إذا كنت تكتب دائمًا بالعربية أو العبرية أو الفارسية ولا تريد التبديل في كل مرة.
+
+> 💡 **نصيحة (وضع Auto):** مثالي للمحادثات المختلطة — كل فقاعة تحصل على الاتجاه الصحيح تلقائيًا.
 
 > 🔄 **إعادة تفعيل تلقائية:** إذا تم تحديث Claude Code واستبدال ملفاته، يتم استعادة RTL تلقائيًا عند بدء التشغيل التالي.
 
@@ -573,6 +606,7 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 |---|---|
 | ▶️ فعال‌سازی RTL | CSS و یک دکمه تغییر را به رابط چت تزریق می‌کند |
 | 📌 فعال‌سازی RTL (همیشه) | فعال‌سازی دائمی RTL بدون دکمه تغییر |
+| 👁️ فعال‌سازی RTL (خودکار) | شناسایی خودکار فارسی/عربی/عبری در هر حباب و تعیین جهت |
 | 🔧 رفع BiDi | فعال‌سازی RTL و رفع متن معکوس (مثلاً "ملاس" → "سلام") |
 | ⏹️ غیرفعال‌سازی RTL | فایل‌های اصلی را از نسخه پشتیبان بازیابی می‌کند |
 | 🔍 بررسی وضعیت | نشان می‌دهد کدام نصب‌ها RTL فعال دارند |
@@ -581,7 +615,11 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 
 ---
 
-### 🆕 تازه‌ها (v0.3.0)
+### 🆕 تازه‌ها (v0.3.1)
+
+- **حالت RTL خودکار** — حالت هوشمند جدیدی که به‌طور خودکار متن فارسی، عربی و عبری را در هر حباب چت با استفاده از MutationObserver شناسایی می‌کند. فقط حباب‌هایی که متن RTL دارند جهت راست به چپ می‌گیرند — حباب‌های انگلیسی LTR باقی می‌مانند. بدون نیاز به تغییر دستی.
+
+### قبلی (v0.3.0)
 
 - **حالت RTL همیشه** — حالت جدیدی که RTL را به‌صورت دائمی فعال می‌کند بدون نیاز به دکمه تغییر. CSS مستقیماً بدون وابستگی به class تزریق می‌شود، بنابراین RTL همیشه فعال است. می‌توانید بین حالت‌ها از طریق منوی نوار وضعیت یا پالت فرمان جابجا شوید.
 - **فعال‌سازی مجدد خودکار** — RTL به‌طور خودکار بازیابی می‌شود وقتی به‌روزرسانی Claude Code فایل‌هایش را جایگزین می‌کند. نیازی به فعال‌سازی مجدد دستی نیست.
@@ -618,6 +656,7 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 |---|---|
 | `RTL: Active` ✅ | RTL فعال با دکمه تغییر |
 | `RTL: Always` 📌 | RTL همیشه فعال (بدون دکمه) |
+| `RTL: Auto` 👁️ | RTL به‌طور خودکار برای هر حباب شناسایی می‌شود |
 | `RTL: Inactive` ⭕ | RTL نصب نشده است |
 | `RTL: N/A` ❌ | افزونه پیدا نشد |
 
@@ -631,6 +670,7 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 |---|---|
 | `Claude RTL: Activate RTL` | ▶️ فعال‌سازی پشتیبانی RTL با دکمه تغییر |
 | `Claude RTL: Activate RTL (Always)` | 📌 فعال‌سازی دائمی RTL بدون دکمه تغییر |
+| `Claude RTL: Activate RTL (Auto)` | 👁️ شناسایی خودکار RTL برای هر حباب |
 | `Claude RTL: Fix BiDi` | 🔧 فعال‌سازی RTL + رفع مشکلات متن دوجهته |
 | `Claude RTL: Deactivate RTL` | ⏹️ غیرفعال‌سازی و بازیابی فایل‌های اصلی |
 | `Claude RTL: Check Status` | 🔍 نمایش وضعیت نصب |
@@ -648,10 +688,14 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 
 **حالت Always** — RTL همیشه فعال است. نیازی به دکمه نیست — متن همیشه از راست به چپ است.
 
+**حالت Auto** — RTL به‌طور خودکار برای هر حباب چت شناسایی می‌شود. حباب‌هایی با فارسی/عربی/عبری به RTL تبدیل می‌شوند؛ حباب‌های انگلیسی LTR باقی می‌مانند. مناسب برای مکالمات چندزبانه.
+
 > 💡 **نکته (حالت Active):** همه مکالمات نیاز به RTL ندارند — می‌توانید آن را برای هر مکالمه جداگانه فعال کنید.
 > از ⇄ فقط در مکالماتی استفاده کنید که به فارسی، عربی یا عبری می‌نویسید.
 
 > 💡 **نکته (حالت Always):** اگر همیشه به فارسی، عربی یا عبری می‌نویسید و نمی‌خواهید هر بار تغییر دهید، از این حالت استفاده کنید.
+
+> 💡 **نکته (حالت Auto):** مناسب برای مکالمات مختلط — هر حباب به‌طور خودکار جهت صحیح را دریافت می‌کند.
 
 > 🔄 **فعال‌سازی مجدد خودکار:** اگر Claude Code به‌روزرسانی شد و فایل‌هایش جایگزین شدند، RTL به‌طور خودکار در راه‌اندازی بعدی بازیابی می‌شود.
 

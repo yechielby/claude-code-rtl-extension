@@ -52,18 +52,17 @@ const BUTTON_STYLES = `
 `;
 
 /** RTL content rules — prefix is prepended to each selector */
-function rtlContentRules(p: string, options?: { skipMessagesContainer?: boolean }): string {
-    const messagesContainer = options?.skipMessagesContainer ? '' : `
-/* Messages container */
-${p}[class*="messagesContainer_"] {
-    direction: rtl;
-}
-`;
+function rtlContentRules(p: string): string {
     return `
 /* ==========================================
    RTL - Hebrew/Arabic content (active when .YBYrtl is on #root)
    ========================================== */
-${messagesContainer}
+
+/* Messages container */
+${p}[class*="messagesContainer_"] {
+    direction: rtl;
+}
+
 /* User messages */
 ${p}[class*="userMessage_"],
 ${p}[class*="userMessageContainer_"] {

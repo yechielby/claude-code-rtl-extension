@@ -43,9 +43,15 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 
 ---
 
-### 🆕 What's New (v0.3.5)
+### 🆕 What's New (v0.3.6)
 
-- **Auto RTL mode** — A new intelligent mode that auto-detects Hebrew, Arabic, and Persian text per chat bubble using a MutationObserver. Only bubbles containing RTL text get right-to-left direction — English-only bubbles stay LTR. No manual toggling needed.
+- **Smart input direction** — The input field now detects text direction on the fly based on the first character you type. Start with a Hebrew, Arabic, or Persian letter and it flows RTL; start with English and it stays LTR. The only exception is **Active** mode with the ⇄ button toggled on — there the input is always RTL.
+- **Fallback button placement** — When the chat header isn't rendered yet (e.g. resuming an active session on startup), the ⇄ toggle button now appears above the input area so you're never left without it.
+- **Safer auto-reactivate** — Version tracking ensures RTL is cleanly re-injected after a Claude Code update instead of stacking on stale CSS.
+
+### Previous (v0.3.5)
+
+- **Auto RTL mode** — An intelligent mode that auto-detects Hebrew, Arabic, and Persian text per chat bubble using a MutationObserver. Only bubbles containing RTL text get right-to-left direction — English-only bubbles stay LTR. No manual toggling needed.
 
 ### Previous (v0.3.0)
 
@@ -144,6 +150,15 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 ### 🔧 Troubleshooting
 
 <details>
+<summary><strong>❓ Can't find the plugin in Cursor or Antigravity</strong></summary>
+
+- Search for the plugin by its ID: `claude-code-rtl`
+- The display name "Claude Code RTL Support" may not appear in search results on all platforms
+- Use the exact ID `claude-code-rtl` in the extensions search bar
+
+</details>
+
+<details>
 <summary><strong>❓ Extension doesn't find Claude Code for VS Code</strong></summary>
 
 - Make sure the "Claude Code for VS Code" extension is installed
@@ -231,9 +246,15 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-### 🆕 מה חדש (v0.3.5)
+### 🆕 מה חדש (v0.3.6)
 
-- **מצב RTL אוטומטי** — מצב חכם חדש שמזהה אוטומטית טקסט בעברית, ערבית ופרסית לכל בועת צ'אט באמצעות MutationObserver. רק בועות שמכילות טקסט RTL מקבלות כיווניות מימין לשמאל — בועות באנגלית בלבד נשארות LTR. ללא צורך בהחלפה ידנית.
+- **כיוון חכם בשדה הקלט** — שדה הקלט מזהה עכשיו את כיוון הטקסט בזמן אמת לפי התו הראשון שמקלידים. מתחילים באות עברית, ערבית או פרסית — הטקסט זורם ימינה; מתחילים באנגלית — נשאר שמאלה. היוצא מן הכלל הוא מצב **Active** כשכפתור ⇄ לחוץ — אז הקלט תמיד RTL.
+- **מיקום חלופי לכפתור** — כשהכותרת של הצ'אט עדיין לא נטענה (למשל בחזרה לשיחה פעילה עם הפעלה), כפתור ⇄ מופיע מעל שדה הקלט כדי שתמיד יהיה נגיש.
+- **הפעלה מחדש אוטומטית בטוחה יותר** — מעקב אחר גרסה מבטיח שה-RTL מוזרק מחדש בצורה נקייה לאחר עדכון Claude Code במקום להיערם על CSS ישן.
+
+### גרסה קודמת (v0.3.5)
+
+- **מצב RTL אוטומטי** — מצב חכם שמזהה אוטומטית טקסט בעברית, ערבית ופרסית לכל בועת צ'אט באמצעות MutationObserver. רק בועות שמכילות טקסט RTL מקבלות כיווניות מימין לשמאל — בועות באנגלית בלבד נשארות LTR. ללא צורך בהחלפה ידנית.
 
 ### גרסה קודמת (v0.3.0)
 
@@ -332,6 +353,15 @@ MIT — see [LICENSE](LICENSE) for details.
 ### 🔧 פתרון בעיות
 
 <details>
+<summary><strong>❓ לא מוצאים את התוסף ב-Cursor או Antigravity</strong></summary>
+
+- חפשו את התוסף לפי המזהה שלו: `claude-code-rtl`
+- השם המלא "Claude Code RTL Support" לא תמיד מופיע בתוצאות חיפוש בכל הפלטפורמות
+- השתמשו במזהה המדויק `claude-code-rtl` בשורת החיפוש של התוספים
+
+</details>
+
+<details>
 <summary><strong>❓ התוסף לא מוצא את Claude Code for VS Code</strong></summary>
 
 - וודא שהתוסף "Claude Code for VS Code" מותקן
@@ -423,9 +453,15 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 
 ---
 
-### 🆕 ما الجديد (v0.3.5)
+### 🆕 ما الجديد (v0.3.6)
 
-- **وضع RTL التلقائي** — وضع ذكي جديد يكتشف تلقائيًا النص العربي والعبري والفارسي لكل فقاعة محادثة باستخدام MutationObserver. الفقاعات التي تحتوي على نص RTL فقط تحصل على اتجاه من اليمين إلى اليسار — الفقاعات الإنجليزية تبقى LTR. لا حاجة للتبديل اليدوي.
+- **اتجاه ذكي في حقل الإدخال** — حقل الإدخال الآن يكتشف اتجاه النص تلقائيًا بناءً على أول حرف تكتبه. ابدأ بحرف عربي أو عبري أو فارسي ويتجه النص لليمين؛ ابدأ بالإنجليزية ويبقى لليسار. الاستثناء الوحيد هو وضع **Active** عند تفعيل زر ⇄ — حيث يكون الإدخال دائمًا RTL.
+- **موقع بديل للزر** — عندما لا يكون رأس المحادثة معروضًا بعد (مثلاً عند استئناف جلسة نشطة عند بدء التشغيل)، يظهر زر ⇄ فوق منطقة الإدخال حتى لا تبقى بدونه.
+- **إعادة تفعيل تلقائية أكثر أمانًا** — تتبع الإصدار يضمن إعادة حقن RTL بشكل نظيف بعد تحديث Claude Code بدلاً من التراكم على CSS قديم.
+
+### السابق (v0.3.5)
+
+- **وضع RTL التلقائي** — وضع ذكي يكتشف تلقائيًا النص العربي والعبري والفارسي لكل فقاعة محادثة باستخدام MutationObserver. الفقاعات التي تحتوي على نص RTL فقط تحصل على اتجاه من اليمين إلى اليسار — الفقاعات الإنجليزية تبقى LTR. لا حاجة للتبديل اليدوي.
 
 ### السابق (v0.3.0)
 
@@ -524,6 +560,15 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 ### 🔧 حل المشاكل
 
 <details>
+<summary><strong>❓ لا يمكن العثور على الإضافة في Cursor أو Antigravity</strong></summary>
+
+- ابحث عن الإضافة باستخدام معرّفها: `claude-code-rtl`
+- الاسم الكامل "Claude Code RTL Support" قد لا يظهر في نتائج البحث على جميع المنصات
+- استخدم المعرّف الدقيق `claude-code-rtl` في شريط البحث عن الإضافات
+
+</details>
+
+<details>
 <summary><strong>❓ الإضافة لا تجد Claude Code for VS Code</strong></summary>
 
 - تأكد من تثبيت إضافة "Claude Code for VS Code"
@@ -615,9 +660,15 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 
 ---
 
-### 🆕 تازه‌ها (v0.3.5)
+### 🆕 تازه‌ها (v0.3.6)
 
-- **حالت RTL خودکار** — حالت هوشمند جدیدی که به‌طور خودکار متن فارسی، عربی و عبری را در هر حباب چت با استفاده از MutationObserver شناسایی می‌کند. فقط حباب‌هایی که متن RTL دارند جهت راست به چپ می‌گیرند — حباب‌های انگلیسی LTR باقی می‌مانند. بدون نیاز به تغییر دستی.
+- **جهت هوشمند در فیلد ورودی** — فیلد ورودی اکنون جهت متن را به‌صورت خودکار بر اساس اولین کاراکتر تایپ‌شده تشخیص می‌دهد. با حرف فارسی، عربی یا عبری شروع کنید و متن به سمت راست جریان می‌یابد؛ با انگلیسی شروع کنید و در سمت چپ باقی می‌ماند. تنها استثنا حالت **Active** است وقتی دکمه ⇄ فعال باشد — در آن صورت ورودی همیشه RTL است.
+- **مکان جایگزین برای دکمه** — وقتی هدر چت هنوز رندر نشده (مثلاً هنگام بازگشت به جلسه فعال در راه‌اندازی)، دکمه ⇄ بالای فیلد ورودی نمایش داده می‌شود تا همیشه در دسترس باشد.
+- **فعال‌سازی مجدد خودکار امن‌تر** — ردیابی نسخه تضمین می‌کند که RTL پس از به‌روزرسانی Claude Code به‌صورت تمیز دوباره تزریق شود به جای انباشته شدن روی CSS قدیمی.
+
+### قبلی (v0.3.5)
+
+- **حالت RTL خودکار** — حالت هوشمندی که به‌طور خودکار متن فارسی، عربی و عبری را در هر حباب چت با استفاده از MutationObserver شناسایی می‌کند. فقط حباب‌هایی که متن RTL دارند جهت راست به چپ می‌گیرند — حباب‌های انگلیسی LTR باقی می‌مانند. بدون نیاز به تغییر دستی.
 
 ### قبلی (v0.3.0)
 
@@ -714,6 +765,15 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 ---
 
 ### 🔧 عیب‌یابی
+
+<details>
+<summary><strong>❓ افزونه را در Cursor یا Antigravity پیدا نمی‌کنید</strong></summary>
+
+- افزونه را با شناسه آن جستجو کنید: `claude-code-rtl`
+- نام کامل "Claude Code RTL Support" ممکن است در نتایج جستجوی همه پلتفرم‌ها نمایش داده نشود
+- از شناسه دقیق `claude-code-rtl` در نوار جستجوی افزونه‌ها استفاده کنید
+
+</details>
 
 <details>
 <summary><strong>❓ افزونه Claude Code for VS Code را پیدا نمی‌کند</strong></summary>

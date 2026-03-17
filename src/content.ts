@@ -111,12 +111,18 @@ ${p}[class*="optionContent_"] {
     unicode-bidi: plaintext;
 }
 
-/* Prompt input — auto-detect direction by first character */
-${p}[class*="messageInput_"] {
+/* Prompt input — always auto-detect direction by first character */
+[class*="messageInputContainer_"] > * {
     unicode-bidi: plaintext;
     text-align: start;
 }
-`;
+${p ? `
+/* Force RTL on input when toggle is active */
+${p}[class*="messageInputContainer_"] > * {
+    direction: rtl;
+    unicode-bidi: normal;
+}
+` : ''}`;
 }
 
 /** LTR override rules — prefix is prepended to each selector */
@@ -247,8 +253,9 @@ const AUTO_RTL_RULES = `
     unicode-bidi: plaintext;
 }
 
-/* Prompt input — no .YBYrtl ancestor in Auto mode, so target directly */
-.YBYrtl [class*="messageInput_"] {
+/* Prompt input container — no .YBYrtl ancestor in Auto mode, use #root
+   for specificity to override *{unicode-bidi:bidi-override} */
+#root [class*="messageInputContainer_"] > * {
     unicode-bidi: plaintext;
     text-align: start;
 }

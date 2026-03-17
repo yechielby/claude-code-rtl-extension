@@ -49,6 +49,13 @@ const BUTTON_STYLES = `
     opacity: 1;
     background: var(--vscode-button-background, rgba(128, 128, 128, 0.3));
 }
+
+/* Fallback wrapper when header is absent (active session on startup) */
+#yby-rtl-btn-wrap {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 8px;
+}
 `;
 
 /** RTL content rules — prefix is prepended to each selector */
@@ -288,13 +295,10 @@ export const RTL_JS_CODE = `
 /* RTL Toggle Button - Added by script */
 (function() {
     var BTN_ID = 'yby-rtl-btn';
+    var WRAP_ID = 'yby-rtl-btn-wrap';
     var ROOT_CLASS = 'YBYrtl';
 
-    function tryInsertButton() {
-        if (document.getElementById(BTN_ID)) return;
-        var header = document.querySelector('[class*="header_"]');
-        if (!header) return;
-
+    function mkBtn() {
         var btn = document.createElement('button');
         btn.id = BTN_ID;
         btn.textContent = '\\u21C4';
@@ -307,10 +311,46 @@ export const RTL_JS_CODE = `
             btn.classList.toggle('yby-active', isActive);
         });
 
-        header.appendChild(btn);
+        return btn;
     }
 
-    // Wait for React to render the header
+    function tryInsertButton() {
+        var header = document.querySelector('[class*="header_"]');
+        var existing = document.getElementById(BTN_ID);
+
+        // Already placed in the header — nothing to do
+        if (existing && header && header.contains(existing)) return;
+
+        // Header appeared but button is in fallback position — migrate to header
+        if (header && existing) {
+            var oldWrap = document.getElementById(WRAP_ID);
+            if (oldWrap) oldWrap.remove(); else existing.remove();
+            header.appendChild(mkBtn());
+            return;
+        }
+
+        // Header exists, no button yet — place in header
+        if (header && !existing) {
+            header.appendChild(mkBtn());
+            return;
+        }
+
+        // No header, button already in fallback — keep it
+        if (existing) return;
+
+        // No header, no button — fallback: active session without header
+        // Place above the input prompt when messages are visible
+        var input = document.querySelector('[class*="inputContainer_"]');
+        if (!input || !input.parentNode) return;
+        if (!document.querySelector('[class*="messagesContainer_"]')) return;
+
+        var wrap = document.createElement('div');
+        wrap.id = WRAP_ID;
+        wrap.appendChild(mkBtn());
+        input.parentNode.insertBefore(wrap, input);
+    }
+
+    // Wait for React to render
     var observer = new MutationObserver(function() {
         tryInsertButton();
     });

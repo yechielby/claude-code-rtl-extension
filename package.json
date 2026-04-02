@@ -2,7 +2,7 @@
   "name": "claude-code-rtl",
   "displayName": "Claude Code RTL Support",
   "description": "Adds RTL (Right-to-Left) text support for Hebrew, Arabic and Persian to Claude Code in VS Code, Cursor and Antigravity",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "publisher": "yechielby",
   "license": "MIT",
   "homepage": "https://github.com/YechielBy/claude-code-rtl-extension#readme",
@@ -52,9 +52,6 @@
     "claude",
     "anthropic",
     "ai-chat"
-  ],
-  "extensionDependencies": [
-    "anthropic.claude-code"
   ],
   "activationEvents": [
     "onStartupFinished"

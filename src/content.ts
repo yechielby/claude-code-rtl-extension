@@ -62,7 +62,7 @@ const BUTTON_STYLES = `
 function rtlContentRules(p: string): string {
     return `
 /* ==========================================
-   RTL - Hebrew/Arabic content (active when .YBYrtl is on #root)
+   RTL - Arabic/Persian content (active when .YBYrtl is on #root)
    ========================================== */
 
 /* Messages container */
@@ -423,7 +423,7 @@ export const RTL_JS_CODE = `
 /* End RTL Toggle Button */
 `;
 
-/** Auto-mode JS — scans bubbles for Hebrew and adds .YBYrtl class */
+/** Auto-mode JS — scans bubbles for RTL text and adds .YBYrtl class */
 export const RTL_AUTO_JS_CODE = `
 /* RTL Toggle Button - Added by script */
 (function() {

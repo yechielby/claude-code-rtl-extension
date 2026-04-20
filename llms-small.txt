@@ -1,6 +1,6 @@
 # Claude Code RTL Support
 
-A VS Code extension that adds Right-to-Left (RTL) text support for Hebrew, Arabic, and Persian to the Claude Code chat interface. Companion extension for Claude Code for VS Code.
+A VS Code extension that adds Right-to-Left (RTL) text support for Arabic and Persian to the Claude Code chat interface. Companion extension for Claude Code for VS Code.
 
 Adds an ⇄ toggle button to switch between RTL and LTR in chat, with three modes: Active (manual toggle), Always (permanent RTL), and Auto (per-bubble language detection). Keeps code blocks and UI elements in LTR. Smart input direction detects language as you type. Auto-reactivates after Claude Code updates.
 

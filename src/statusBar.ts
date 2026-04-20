@@ -32,7 +32,7 @@ export async function updateStatusBar(): Promise<void> {
 
     if (autoMode) {
         statusBarItem.text = '$(globe) RTL: Auto';
-        statusBarItem.tooltip = 'Claude Code RTL auto-detects Hebrew. Click to manage.';
+        statusBarItem.tooltip = 'Claude Code RTL auto-detects direction. Click to manage.';
     } else if (alwaysMode) {
         statusBarItem.text = '$(globe) RTL: Always';
         statusBarItem.tooltip = 'Claude Code RTL is always on. Click to manage.';

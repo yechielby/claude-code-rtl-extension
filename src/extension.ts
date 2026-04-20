@@ -117,7 +117,7 @@ async function handleShowMenu(): Promise<void> {
     const items: MenuAction[] = [
         { label: '$(check) Activate RTL', description: 'Enable RTL support with toggle button', command: 'claude-rtl.add' },
         { label: '$(pin) Activate RTL (Always)', description: 'Enable RTL permanently without toggle button', command: 'claude-rtl.addAlways' },
-        { label: '$(eye) Activate RTL (Auto)', description: 'Auto-detect Hebrew per paragraph and set direction', command: 'claude-rtl.addAuto' },
+        { label: '$(eye) Activate RTL (Auto)', description: 'Auto-detect RTL text per paragraph and set direction', command: 'claude-rtl.addAuto' },
         { label: '$(tools) Fix BiDi', description: 'Activate RTL and fix bidirectional text issues', command: 'claude-rtl.fixBidi' },
         { label: '$(close) Deactivate RTL', description: 'Disable RTL support and restore original files', command: 'claude-rtl.remove' },
         { label: '$(info) Check Status', description: 'Show current RTL status', command: 'claude-rtl.status' },

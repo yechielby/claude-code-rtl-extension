@@ -48,7 +48,7 @@ export async function isAlwaysMode(cssPath: string): Promise<boolean> {
 }
 
 /**
- * Check if CSS is in "auto" mode (per-element Hebrew detection).
+ * Check if CSS is in "auto" mode (per-element RTL detection).
  */
 export async function isAutoMode(cssPath: string): Promise<boolean> {
     try {
@@ -244,7 +244,7 @@ export async function addRtlAlways(ext: ClaudeExtensionInfo, fonts?: FontOptions
 }
 
 /**
- * Add RTL "Auto" mode — per-element Hebrew detection via JS MutationObserver.
+ * Add RTL "Auto" mode — per-element RTL detection via JS MutationObserver.
  */
 export async function addRtlAuto(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const messages: string[] = [];

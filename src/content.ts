@@ -116,8 +116,8 @@ ${p}[class*="optionContent_"] {
     unicode-bidi: plaintext;
     text-align: start;
 }
-${p ? `
-/* Force RTL on input when toggle is active */
+${p !== undefined ? `
+/* Force RTL on input */
 ${p}[class*="messageInputContainer_"] > * {
     direction: rtl;
     unicode-bidi: normal;

@@ -35,6 +35,10 @@
     "antigravity-extension",
     "antigravity-ide",
     "antigravity-plugin",
+    "kiro",
+    "kiro-extension",
+    "kiro-ide",
+    "kiro-plugin",
     "farsi",
     "farsi-language",
     "hebrew",
@@ -69,6 +73,21 @@
   "icon": "claude-code-rtl-logo.png",
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Claude RTL",
+      "properties": {
+        "claude-rtl.textFont": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Font family for text/prose areas in Claude Code (e.g. `Vazirmatn`, `Tahoma`). Leave empty to use default."
+        },
+        "claude-rtl.codeFont": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Font family for code blocks in Claude Code (e.g. `JetBrains Mono`, `Fira Code`). Leave empty to use default."
+        }
+      }
+    },
     "commands": [
       {
         "command": "claude-rtl.add",

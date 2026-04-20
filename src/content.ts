@@ -1,10 +1,10 @@
 /** Marker at the beginning of injected CSS block */
 export const RTL_START_MARKER =
-    '/* RTL Text Support for Claude Code VS Code / Cursor / Antigravity Extension - Added by script */';
+    '/* RTL Text Support for Claude Code VS Code / Cursor / Antigravity / Kiro Extension - Added by script */';
 
 /** Marker at the end of injected CSS block */
 export const RTL_END_MARKER =
-    '/* End RTL Text Support for Claude Code VS Code / Cursor / Antigravity Extension */';
+    '/* End RTL Text Support for Claude Code VS Code / Cursor / Antigravity / Kiro Extension */';
 
 /** Marker at the beginning of injected JS block */
 export const JS_START_MARKER = '/* RTL Toggle Button - Added by script */';
@@ -261,7 +261,53 @@ const AUTO_RTL_RULES = `
 }
 `;
 
+// ── Font Options ──────────────────────────────────────────────────
+
+export interface FontOptions {
+    textFont: string;
+    codeFont: string;
+}
+
+function generateFontCss(fonts: FontOptions, p: string): string {
+    const parts: string[] = [];
+    if (fonts.textFont) {
+        parts.push(`
+/* Custom text font */
+${p}[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) > :is(p, ul, ol, h1, h2, h3, h4, blockquote),
+${p}[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) > :is(ul, ol) li,
+${p}[class*="userMessage_"] {
+    font-family: ${fonts.textFont}, sans-serif;
+}
+
+#root div[contenteditable][class*="messageInput_"],
+#root [class*="mentionMirror_"] {
+    font-family: ${fonts.textFont}, sans-serif !important;
+}`);
+    }
+    if (fonts.codeFont) {
+        parts.push(`
+/* Custom code font */
+${p}pre,
+${p}code,
+${p}[class*="codeBlockWrapper_"] {
+    font-family: ${fonts.codeFont}, monospace !important;
+}
+
+/* Diff editor — Monaco sets font-family as inline style, needs !important */
+[class*="diffEditorWrapper_"] .view-lines,
+[class*="diffEditorWrapper_"] .view-overlays,
+[class*="diffEditorWrapper_"] .margin-view-overlays,
+[class*="diffEditorWrapper_"] .cursor,
+[class*="diffEditorWrapper_"] .inputarea {
+    font-family: ${fonts.codeFont}, monospace !important;
+}`);
+    }
+    return parts.join('\n');
+}
+
 // ── CSS Assembly ──────────────────────────────────────────────────
+
+const NO_FONTS: FontOptions = { textFont: '', codeFont: '' };
 
 function assembleCss(modeMarker: string, parts: string[]): string {
     return `
@@ -273,25 +319,30 @@ ${RTL_END_MARKER}
 }
 
 /** Active mode — .YBYrtl prefix + toggle button */
-export const RTL_CSS_RULES = assembleCss(RTL_MODE_ACTIVE_MARKER, [
-    BUTTON_STYLES,
-    rtlContentRules(P),
-    ltrOverrideRules(P),
-]);
+export function generateActiveCssRules(fonts: FontOptions = NO_FONTS): string {
+    return assembleCss(RTL_MODE_ACTIVE_MARKER, [
+        BUTTON_STYLES,
+        rtlContentRules(P),
+        ltrOverrideRules(P),
+        generateFontCss(fonts, P),
+    ]);
+}
 
 /** Always mode — no prefix, no button */
-export function generateAlwaysCssRules(): string {
+export function generateAlwaysCssRules(fonts: FontOptions = NO_FONTS): string {
     return assembleCss(RTL_MODE_ALWAYS_MARKER, [
         rtlContentRules(''),
         ltrOverrideRules(''),
+        generateFontCss(fonts, ''),
     ]);
 }
 
 /** Auto mode — dedicated RTL rules (no descendant/self conflicts) + LTR overrides */
-export function generateAutoCssRules(): string {
+export function generateAutoCssRules(fonts: FontOptions = NO_FONTS): string {
     return assembleCss(RTL_MODE_AUTO_MARKER, [
         AUTO_RTL_RULES,
         ltrOverrideRules(P),
+        generateFontCss(fonts, P),
     ]);
 }
 

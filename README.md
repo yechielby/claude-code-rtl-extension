@@ -56,11 +56,14 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 | 🔍 Check Status | Shows which installations have RTL enabled |
 | 📊 Status Bar | Shows current RTL state at a glance — click to manage |
 | 🔄 Auto-reactivate | Automatically restores RTL after Claude Code updates |
+| 🔤 Font settings | Customize font for text areas and code blocks separately |
 
 ---
 
 ### 🆕 What's New (v0.3.7)
 
+- **Kiro IDE support** — The extension now detects and supports Kiro alongside VS Code, Cursor, and Antigravity.
+- **Font customization** — Set separate fonts for text areas and code blocks via `claude-rtl.textFont` and `claude-rtl.codeFont` settings.
 - **Antigravity IDE support** — The extension now detects and supports Antigravity alongside VS Code and Cursor.
 
 <details>
@@ -103,6 +106,7 @@ The original Claude Code for VS Code extension lacks native RTL support. This of
 | VS Code |
 | Cursor |
 | Antigravity |
+| Kiro |
 
 ---
 
@@ -158,6 +162,28 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 > 💡 **Tip (Auto mode):** Best for mixed conversations — each bubble gets the right direction automatically.
 
 > 🔄 **Auto-reactivate:** If Claude Code updates and replaces its files, RTL is automatically restored on the next startup.
+
+---
+
+### ⚙️ Font Settings
+
+Customize the fonts used in Claude Code by adding settings to your `settings.json` (`Cmd+,` → search `claude-rtl`):
+
+| Setting | Description | Example |
+|---|---|---|
+| `claude-rtl.textFont` | Font for text, messages, and the input box | `Vazirmatn`, `Tahoma` |
+| `claude-rtl.codeFont` | Font for code blocks | `JetBrains Mono`, `Fira Code` |
+
+```json
+{
+  "claude-rtl.textFont": "Vazirmatn",
+  "claude-rtl.codeFont": "JetBrains Mono"
+}
+```
+
+> 💡 Leave a setting empty to keep the original Claude Code font.
+>
+> 🔄 Changing a font setting automatically re-injects the CSS and reloads the window.
 
 ---
 
@@ -268,11 +294,14 @@ MIT — see [LICENSE](LICENSE) for details.
 | 🔍 בדיקת סטטוס | מציג אילו התקנות פועלות עם RTL |
 | 📊 שורת מצב | מציג את המצב הנוכחי בתחתית המסך — לחץ לניהול |
 | 🔄 הפעלה מחדש אוטומטית | משחזר RTL אוטומטית לאחר עדכון Claude Code |
+| 🔤 הגדרות גופן | התאמה אישית של גופן לאזורי טקסט ובלוקי קוד בנפרד |
 
 ---
 
 ### 🆕 מה חדש (v0.3.7)
 
+- **תמיכה ב-Kiro IDE** — התוסף מזהה ותומך כעת ב-Kiro לצד VS Code, Cursor ו-Antigravity.
+- **התאמת גופן** — הגדרת גופן נפרד לאזורי טקסט ולבלוקי קוד דרך `claude-rtl.textFont` ו-`claude-rtl.codeFont`.
 - **תמיכה ב-Antigravity IDE** — התוסף מזהה ותומך כעת ב-Antigravity לצד VS Code ו-Cursor.
 
 <details>
@@ -315,6 +344,7 @@ MIT — see [LICENSE](LICENSE) for details.
 | VS Code |
 | Cursor |
 | Antigravity |
+| Kiro |
 
 ---
 
@@ -370,6 +400,28 @@ MIT — see [LICENSE](LICENSE) for details.
 > 💡 **טיפ (מצב Auto):** מתאים לשיחות מעורבות — כל בועה מקבלת את הכיוון הנכון אוטומטית.
 
 > 🔄 **הפעלה מחדש אוטומטית:** אם Claude Code מתעדכן ומחליף את הקבצים, RTL משוחזר אוטומטית בהפעלה הבאה.
+
+---
+
+### ⚙️ הגדרות גופן
+
+התאם אישית את הגופנים בממשק Claude Code על ידי הוספת הגדרות ל-`settings.json` (פתח עם `Cmd+,` וחפש `claude-rtl`):
+
+| הגדרה | תיאור | דוגמה |
+|---|---|---|
+| `claude-rtl.textFont` | גופן לאזורי טקסט, הודעות ושדה ההקלדה | `Vazirmatn`, `David` |
+| `claude-rtl.codeFont` | גופן לבלוקי קוד | `JetBrains Mono`, `Fira Code` |
+
+```json
+{
+  "claude-rtl.textFont": "Vazirmatn",
+  "claude-rtl.codeFont": "JetBrains Mono"
+}
+```
+
+> 💡 השאר ריק כדי לשמור על הגופן המקורי של Claude Code.
+>
+> 🔄 שינוי הגדרת גופן מחיל מחדש את ה-CSS ומטעין את החלון אוטומטית.
 
 ---
 
@@ -482,11 +534,14 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 | 🔍 فحص الحالة | يعرض التثبيتات التي تعمل بـ RTL |
 | 📊 شريط الحالة | يعرض الحالة الحالية في أسفل الشاشة — انقر للإدارة |
 | 🔄 إعادة تفعيل تلقائية | تستعيد RTL تلقائيًا بعد تحديث Claude Code |
+| 🔤 إعدادات الخط | تخصيص خط منفصل لمناطق النص وبلوكات الكود |
 
 ---
 
 ### 🆕 ما الجديد (v0.3.7)
 
+- **دعم Kiro IDE** — الإضافة الآن تكتشف وتدعم Kiro إلى جانب VS Code و Cursor و Antigravity.
+- **تخصيص الخط** — تعيين خط منفصل لمناطق النص وبلوكات الكود عبر إعدادي `claude-rtl.textFont` و `claude-rtl.codeFont`.
 - **دعم Antigravity IDE** — الإضافة الآن تكتشف وتدعم Antigravity إلى جانب VS Code و Cursor.
 
 <details>
@@ -529,6 +584,7 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 | VS Code |
 | Cursor |
 | Antigravity |
+| Kiro |
 
 ---
 
@@ -584,6 +640,28 @@ MIT — ראה קובץ [LICENSE](LICENSE) לפרטים.
 > 💡 **نصيحة (وضع Auto):** مثالي للمحادثات المختلطة — كل فقاعة تحصل على الاتجاه الصحيح تلقائيًا.
 
 > 🔄 **إعادة تفعيل تلقائية:** إذا تم تحديث Claude Code واستبدال ملفاته، يتم استعادة RTL تلقائيًا عند بدء التشغيل التالي.
+
+---
+
+### ⚙️ إعدادات الخط
+
+خصّص الخطوط المستخدمة في Claude Code بإضافة إعدادات إلى `settings.json` (افتح بـ `Cmd+,` وابحث عن `claude-rtl`):
+
+| الإعداد | الوصف | مثال |
+|---|---|---|
+| `claude-rtl.textFont` | خط لمناطق النص والرسائل وحقل الإدخال | `Vazirmatn`, `Cairo` |
+| `claude-rtl.codeFont` | خط لبلوكات الكود | `JetBrains Mono`, `Fira Code` |
+
+```json
+{
+  "claude-rtl.textFont": "Vazirmatn",
+  "claude-rtl.codeFont": "JetBrains Mono"
+}
+```
+
+> 💡 اترك الإعداد فارغًا للاحتفاظ بالخط الأصلي لـ Claude Code.
+>
+> 🔄 تغيير إعداد الخط يعيد حقن CSS ويعيد تحميل النافذة تلقائيًا.
 
 ---
 
@@ -696,11 +774,14 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 | 🔍 بررسی وضعیت | نشان می‌دهد کدام نصب‌ها RTL فعال دارند |
 | 📊 نوار وضعیت | وضعیت فعلی RTL را نمایش می‌دهد — برای مدیریت کلیک کنید |
 | 🔄 فعال‌سازی مجدد خودکار | RTL را به‌طور خودکار پس از به‌روزرسانی Claude Code بازیابی می‌کند |
+| 🔤 تنظیمات فونت | تنظیم فونت جداگانه برای متن و بلاک‌های کد |
 
 ---
 
 ### 🆕 تازه‌ها (v0.3.7)
 
+- **پشتیبانی از Kiro IDE** — افزونه اکنون Kiro را در کنار VS Code، Cursor و Antigravity شناسایی و پشتیبانی می‌کند.
+- **شخصی‌سازی فونت** — تنظیم فونت جداگانه برای متن و بلاک‌های کد از طریق `claude-rtl.textFont` و `claude-rtl.codeFont`.
 - **پشتیبانی از Antigravity IDE** — افزونه اکنون Antigravity را در کنار VS Code و Cursor شناسایی و پشتیبانی می‌کند.
 
 <details>
@@ -743,6 +824,7 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 | VS Code |
 | Cursor |
 | Antigravity |
+| Kiro |
 
 ---
 
@@ -798,6 +880,28 @@ MIT — انظر ملف [LICENSE](LICENSE) للتفاصيل.
 > 💡 **نکته (حالت Auto):** مناسب برای مکالمات مختلط — هر حباب به‌طور خودکار جهت صحیح را دریافت می‌کند.
 
 > 🔄 **فعال‌سازی مجدد خودکار:** اگر Claude Code به‌روزرسانی شد و فایل‌هایش جایگزین شدند، RTL به‌طور خودکار در راه‌اندازی بعدی بازیابی می‌شود.
+
+---
+
+### ⚙️ تنظیمات فونت
+
+فونت‌های مورد استفاده در Claude Code را با افزودن تنظیمات به `settings.json` شخصی‌سازی کنید (`Cmd+,` → جستجوی `claude-rtl`):
+
+| تنظیم | توضیح | مثال |
+|---|---|---|
+| `claude-rtl.textFont` | فونت برای متن، پیام‌ها و باکس ورودی | `Vazirmatn`, `Tahoma` |
+| `claude-rtl.codeFont` | فونت برای بلاک‌های کد | `JetBrains Mono`, `Fira Code` |
+
+```json
+{
+  "claude-rtl.textFont": "Vazirmatn",
+  "claude-rtl.codeFont": "JetBrains Mono"
+}
+```
+
+> 💡 برای نگه‌داشتن فونت اصلی Claude Code، تنظیم را خالی بگذارید.
+>
+> 🔄 تغییر تنظیم فونت به‌طور خودکار CSS را دوباره inject کرده و پنجره را reload می‌کند.
 
 ---
 

@@ -1,16 +1,16 @@
 # Claude Code RTL Support
 
-> A VS Code extension that adds Right-to-Left (RTL) text support for Hebrew, Arabic & Persian to Claude Code in VS Code, Cursor & Antigravity.
+> A VS Code extension that adds Right-to-Left (RTL) text support for Arabic & Persian to Claude Code in VS Code, Cursor & Antigravity.
 
 ## What is this?
 
-**Claude Code RTL Support** is a companion extension for [Claude Code for VS Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). It solves a critical usability problem: the Claude Code chat interface has no native RTL support, making it very difficult for Hebrew, Arabic, and Persian speakers to read and write in their language.
+**Claude Code RTL Support** is a companion extension for [Claude Code for VS Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code). It solves a critical usability problem: the Claude Code chat interface has no native RTL support, making it very difficult for Arabic and Persian speakers to read and write in their language.
 
 Without this extension, RTL text in the Claude Code chat appears misaligned, mixed-language conversations (code + RTL text) are hard to read, and in some cases text is completely reversed due to a `bidi-override` CSS rule that forces LTR on everything.
 
 ## Who is it for?
 
-Anyone who uses Claude Code in VS Code, Cursor, or Antigravity and writes in Hebrew, Arabic, or Persian. This includes developers who chat with Claude in their native RTL language, whether exclusively or mixed with English.
+Anyone who uses Claude Code in VS Code, Cursor, or Antigravity and writes in Arabic or Persian. This includes developers who chat with Claude in their native RTL language, whether exclusively or mixed with English.
 
 ## What does it do?
 
@@ -18,17 +18,17 @@ The extension adds an **⇄ toggle button** to the Claude Code chat header that 
 
 ### Three RTL Modes
 
-- **Active** — Adds an ⇄ toggle button to the chat header. Click it to switch to RTL when chatting in Hebrew/Arabic/Persian, click again to return to LTR. Best when you switch between languages across conversations.
+- **Active** — Adds an ⇄ toggle button to the chat header. Click it to switch to RTL when chatting in Arabic/Persian, click again to return to LTR. Best when you switch between languages across conversations.
 - **Always** — RTL is permanently enabled without a toggle button. Text is always right-to-left. Best when you always write in an RTL language.
-- **Auto** — Automatically detects the language of each chat bubble. Bubbles with Hebrew/Arabic/Persian text become RTL; English-only bubbles stay LTR. No manual toggling needed. Best for mixed-language conversations.
+- **Auto** — Automatically detects the language of each chat bubble. Bubbles with Arabic/Persian text become RTL; English-only bubbles stay LTR. No manual toggling needed. Best for mixed-language conversations.
 
 ### Smart Input Direction
 
-The input field automatically detects text direction based on the first character typed. Start with a Hebrew, Arabic, or Persian letter and the input flows RTL; start with English and it stays LTR.
+The input field automatically detects text direction based on the first character typed. Start with an Arabic or Persian letter and the input flows RTL; start with English and it stays LTR.
 
 ### Fix BiDi
 
-Claude Code sometimes injects a CSS rule (`*{direction:ltr;unicode-bidi:bidi-override}`) that causes RTL text to appear completely reversed (e.g., "םולש" instead of "שלום"). The **Fix BiDi** command activates RTL and removes this problematic rule.
+Claude Code sometimes injects a CSS rule (`*{direction:ltr;unicode-bidi:bidi-override}`) that causes RTL text to appear completely reversed (e.g., "ملاس" instead of "سلام"). The **Fix BiDi** command activates RTL and removes this problematic rule.
 
 ### Auto-Reactivate
 

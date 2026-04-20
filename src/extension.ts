@@ -2,10 +2,19 @@ import * as vscode from 'vscode';
 import { ClaudeExtensionInfo, RtlMode } from './types.js';
 import { findClaudeExtensions } from './finder.js';
 import { addRtl, addRtlAlways, addRtlAuto, removeRtl, fixBidi, getStatus } from './injector.js';
+import { FontOptions } from './content.js';
 import { createStatusBarItem, updateStatusBar, disposeStatusBar } from './statusBar.js';
 
 const STATE_MODE_KEY = 'rtl.mode';
 const STATE_VERSION_KEY = 'rtl.version';
+
+function getFontOptions(): FontOptions {
+    const cfg = vscode.workspace.getConfiguration('claude-rtl');
+    return {
+        textFont: cfg.get<string>('textFont', '').trim(),
+        codeFont: cfg.get<string>('codeFont', '').trim(),
+    };
+}
 
 let outputChannel: vscode.OutputChannel;
 let globalState: vscode.Memento;
@@ -26,7 +35,7 @@ function getSavedMode(): RtlMode {
     return globalState.get<RtlMode>(STATE_MODE_KEY, 'inactive');
 }
 
-type InjectionAction = (ext: ClaudeExtensionInfo) => Promise<{ messages: string[]; changed: boolean }>;
+type InjectionAction = (ext: ClaudeExtensionInfo, fonts?: FontOptions) => Promise<{ messages: string[]; changed: boolean }>;
 
 async function handleMode(
     label: string,
@@ -44,9 +53,10 @@ async function handleMode(
     channel.clear();
     channel.appendLine(`${label}...\n`);
 
+    const fonts = getFontOptions();
     let anyChanged = false;
     for (const ext of extensions) {
-        const result = await action(ext);
+        const result = await action(ext, fonts);
         result.messages.forEach(m => channel.appendLine(m));
         if (result.changed) anyChanged = true;
     }
@@ -107,7 +117,7 @@ async function handleShowMenu(): Promise<void> {
     const items: MenuAction[] = [
         { label: '$(check) Activate RTL', description: 'Enable RTL support with toggle button', command: 'claude-rtl.add' },
         { label: '$(pin) Activate RTL (Always)', description: 'Enable RTL permanently without toggle button', command: 'claude-rtl.addAlways' },
-        { label: '$(eye) Activate RTL (Auto)', description: 'Auto-detect Hebrew per paragraph and set direction', command: 'claude-rtl.addAuto' },
+        { label: '$(eye) Activate RTL (Auto)', description: 'Auto-detect RTL text per paragraph and set direction', command: 'claude-rtl.addAuto' },
         { label: '$(tools) Fix BiDi', description: 'Activate RTL and fix bidirectional text issues', command: 'claude-rtl.fixBidi' },
         { label: '$(close) Deactivate RTL', description: 'Disable RTL support and restore original files', command: 'claude-rtl.remove' },
         { label: '$(info) Check Status', description: 'Show current RTL status', command: 'claude-rtl.status' },
@@ -128,10 +138,10 @@ const MODE_ACTIONS: Record<string, InjectionAction> = {
     auto: addRtlAuto,
 };
 
-async function silentInject(extensions: ClaudeExtensionInfo[], action: InjectionAction): Promise<boolean> {
+async function silentInject(extensions: ClaudeExtensionInfo[], action: InjectionAction, fonts?: FontOptions): Promise<boolean> {
     let anyChanged = false;
     for (const ext of extensions) {
-        const result = await action(ext);
+        const result = await action(ext, fonts);
         if (result.changed) anyChanged = true;
     }
     return anyChanged;
@@ -177,7 +187,7 @@ async function autoReactivate(): Promise<void> {
                 await saveVersion();
                 // Re-inject with latest code
                 const action = MODE_ACTIONS[detectedMode];
-                if (action && await silentInject(extensions, action)) {
+                if (action && await silentInject(extensions, action, getFontOptions())) {
                     vscode.commands.executeCommand('workbench.action.reloadWindow');
                 }
                 return;
@@ -195,7 +205,7 @@ async function autoReactivate(): Promise<void> {
         await saveVersion();
         if (extensions.length === 0) return;
 
-        if (await silentInject(extensions, addRtl)) {
+        if (await silentInject(extensions, addRtl, getFontOptions())) {
             vscode.commands.executeCommand('workbench.action.reloadWindow');
         }
         return;
@@ -211,7 +221,7 @@ async function autoReactivate(): Promise<void> {
         if (extensions.length === 0) return;
 
         const action = MODE_ACTIONS[savedMode];
-        if (action && await silentInject(extensions, action)) {
+        if (action && await silentInject(extensions, action, getFontOptions())) {
             vscode.commands.executeCommand('workbench.action.reloadWindow');
         }
         return;
@@ -228,7 +238,20 @@ async function autoReactivate(): Promise<void> {
     if (!needsReinjection) return;
 
     const action = MODE_ACTIONS[savedMode];
-    if (action && await silentInject(extensions, action)) {
+    if (action && await silentInject(extensions, action, getFontOptions())) {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
+}
+
+async function handleFontSettingChange(): Promise<void> {
+    const savedMode = getSavedMode();
+    if (savedMode === 'inactive') return;
+
+    const extensions = await findClaudeExtensions();
+    if (extensions.length === 0) return;
+
+    const action = MODE_ACTIONS[savedMode];
+    if (action && await silentInject(extensions, action, getFontOptions())) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
     }
 }
@@ -248,6 +271,14 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('claude-rtl.remove', handleRemove),
         vscode.commands.registerCommand('claude-rtl.status', handleStatus),
         vscode.commands.registerCommand('claude-rtl.showMenu', handleShowMenu),
+    );
+
+    context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration('claude-rtl.textFont') || e.affectsConfiguration('claude-rtl.codeFont')) {
+                handleFontSettingChange().catch(err => console.error('RTL font update failed:', err));
+            }
+        }),
     );
 
     autoReactivate().catch(err => console.error('RTL auto-reactivation failed:', err));

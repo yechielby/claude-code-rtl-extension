@@ -1,12 +1,12 @@
 import * as fs from 'fs/promises';
 import { ClaudeExtensionInfo, RtlStatus } from './types.js';
 import {
-    RTL_CSS_RULES, RTL_JS_CODE,
+    FontOptions, RTL_JS_CODE,
     RTL_START_MARKER, RTL_END_MARKER,
     JS_START_MARKER, JS_END_MARKER,
     RTL_MODE_ALWAYS_MARKER, RTL_MODE_AUTO_MARKER,
     RTL_AUTO_JS_CODE,
-    generateAlwaysCssRules, generateAutoCssRules,
+    generateActiveCssRules, generateAlwaysCssRules, generateAutoCssRules,
 } from './content.js';
 
 const BIDI_OVERRIDE = '*{direction:ltr;unicode-bidi:bidi-override}';
@@ -48,7 +48,7 @@ export async function isAlwaysMode(cssPath: string): Promise<boolean> {
 }
 
 /**
- * Check if CSS is in "auto" mode (per-element Hebrew detection).
+ * Check if CSS is in "auto" mode (per-element RTL detection).
  */
 export async function isAutoMode(cssPath: string): Promise<boolean> {
     try {
@@ -200,11 +200,11 @@ export async function getStatus(extensions: ClaudeExtensionInfo[]): Promise<RtlS
 /**
  * Add RTL support (Active mode) — CSS with .YBYrtl class + toggle button JS.
  */
-export async function addRtl(ext: ClaudeExtensionInfo): Promise<InjectionResult> {
+export async function addRtl(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const messages: string[] = [];
     let changed = false;
 
-    if (await injectFile(ext.cssPath, RTL_CSS_RULES, 'CSS', messages)) {
+    if (await injectFile(ext.cssPath, generateActiveCssRules(fonts), 'CSS', messages)) {
         messages.push(`  CSS: RTL support added to ${ext.name}`);
         changed = true;
     }
@@ -222,11 +222,11 @@ export async function addRtl(ext: ClaudeExtensionInfo): Promise<InjectionResult>
 /**
  * Add RTL "Always" mode — CSS without .YBYrtl class, no JS button.
  */
-export async function addRtlAlways(ext: ClaudeExtensionInfo): Promise<InjectionResult> {
+export async function addRtlAlways(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const messages: string[] = [];
     let changed = false;
 
-    if (await injectFile(ext.cssPath, generateAlwaysCssRules(), 'CSS', messages, { fixBidi: true })) {
+    if (await injectFile(ext.cssPath, generateAlwaysCssRules(fonts), 'CSS', messages, { fixBidi: true })) {
         messages.push(`  CSS: RTL Always support added to ${ext.name}`);
         changed = true;
     }
@@ -244,13 +244,13 @@ export async function addRtlAlways(ext: ClaudeExtensionInfo): Promise<InjectionR
 }
 
 /**
- * Add RTL "Auto" mode — per-element Hebrew detection via JS MutationObserver.
+ * Add RTL "Auto" mode — per-element RTL detection via JS MutationObserver.
  */
-export async function addRtlAuto(ext: ClaudeExtensionInfo): Promise<InjectionResult> {
+export async function addRtlAuto(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const messages: string[] = [];
     let changed = false;
 
-    if (await injectFile(ext.cssPath, generateAutoCssRules(), 'CSS', messages, { fixBidi: true })) {
+    if (await injectFile(ext.cssPath, generateAutoCssRules(fonts), 'CSS', messages, { fixBidi: true })) {
         messages.push(`  CSS: RTL Auto support added to ${ext.name}`);
         changed = true;
     }
@@ -269,10 +269,10 @@ export async function addRtlAuto(ext: ClaudeExtensionInfo): Promise<InjectionRes
  * Add RTL support and fix BiDi issue by removing the bidi-override rule.
  * Preserves the current mode.
  */
-export async function fixBidi(ext: ClaudeExtensionInfo): Promise<InjectionResult> {
+export async function fixBidi(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const currentlyAuto = await isAutoMode(ext.cssPath);
     const currentlyAlways = !currentlyAuto && await isAlwaysMode(ext.cssPath);
-    const result = currentlyAuto ? await addRtlAuto(ext) : currentlyAlways ? await addRtlAlways(ext) : await addRtl(ext);
+    const result = currentlyAuto ? await addRtlAuto(ext, fonts) : currentlyAlways ? await addRtlAlways(ext, fonts) : await addRtl(ext, fonts);
 
     // After injection, remove the bidi-override rule if still present
     try {

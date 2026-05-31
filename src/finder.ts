@@ -97,17 +97,24 @@ async function getSearchDirectories(ide: Ide): Promise<string[]> {
     const platform = process.platform;
     const dirs: string[] = [];
 
-    const ideDirMap: Record<Ide, { local: string; server: string }> = {
-        vscode: { local: '.vscode', server: '.vscode-server' },
-        cursor: { local: '.cursor', server: '.cursor-server' },
-        antigravity: { local: '.antigravity', server: '.antigravity-server' },
-        kiro: { local: '.kiro', server: '.kiro-server' },
+    // Each IDE maps to one or more {local, server} dir-name pairs. Antigravity
+    // renamed its data dir from `.antigravity` to `.antigravity-ide` in a recent
+    // release; both are searched so old and new installs keep working.
+    const ideDirMap: Record<Ide, Array<{ local: string; server: string }>> = {
+        vscode: [{ local: '.vscode', server: '.vscode-server' }],
+        cursor: [{ local: '.cursor', server: '.cursor-server' }],
+        antigravity: [
+            { local: '.antigravity-ide', server: '.antigravity-ide-server' },
+            { local: '.antigravity', server: '.antigravity-server' },
+        ],
+        kiro: [{ local: '.kiro', server: '.kiro-server' }],
     };
 
     const addExtDirs = (home: string, ide: Ide) => {
-        const { local, server } = ideDirMap[ide];
-        dirs.push(path.join(home, local, 'extensions'));
-        dirs.push(path.join(home, server, 'extensions'));
+        for (const { local, server } of ideDirMap[ide]) {
+            dirs.push(path.join(home, local, 'extensions'));
+            dirs.push(path.join(home, server, 'extensions'));
+        }
     };
 
     if (platform === 'win32') {
@@ -119,8 +126,9 @@ async function getSearchDirectories(ide: Ide): Promise<string[]> {
         // Also search inside WSL distros
         const wslHomes = await getWslLinuxHomes();
         for (const wslHome of wslHomes) {
-            const serverDir = ideDirMap[ide].server;
-            dirs.push(path.join(wslHome, serverDir, 'extensions'));
+            for (const { server } of ideDirMap[ide]) {
+                dirs.push(path.join(wslHome, server, 'extensions'));
+            }
         }
     } else if (platform === 'darwin') {
         addExtDirs(os.homedir(), ide);

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.1
+
+- **Fix Antigravity detection** — Antigravity renamed its data directory from `.antigravity` to `.antigravity-ide` in a recent release, so the extension could no longer find Claude Code's webview files and RTL stopped working. The finder now searches `.antigravity-ide` (and its server variant) first, falling back to the old `.antigravity` path for older installs.
+
 ## v0.4.0
 
 - **Custom font settings** — Two new VS Code settings let you choose the fonts Claude Code uses:

@@ -1,6 +1,15 @@
 .vscode/**
+.claude/**
 src/**
 node_modules/**
 tsconfig.json
 esbuild.mjs
 **/*.map
+**/*.vsix
+**/.DS_Store
+.gitignore
+package-lock.json
+CLAUDE.md
+*.code-workspace
+llms.txt
+llms-small.txt

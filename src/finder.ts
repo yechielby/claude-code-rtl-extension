@@ -97,17 +97,24 @@ async function getSearchDirectories(ide: Ide): Promise<string[]> {
     const platform = process.platform;
     const dirs: string[] = [];
 
-    const ideDirMap: Record<Ide, { local: string; server: string }> = {
+    const ideDirMap: Record<Ide, { local: string; server: string; extra?: string[] }> = {
         vscode: { local: '.vscode', server: '.vscode-server' },
         cursor: { local: '.cursor', server: '.cursor-server' },
-        antigravity: { local: '.antigravity', server: '.antigravity-server' },
+        // Newer Antigravity builds moved extensions to ~/.antigravity-ide/extensions.
+        // Keep the legacy ~/.antigravity as a fallback for older installs.
+        antigravity: { local: '.antigravity-ide', server: '.antigravity-server', extra: ['.antigravity'] },
         kiro: { local: '.kiro', server: '.kiro-server' },
     };
 
     const addExtDirs = (home: string, ide: Ide) => {
-        const { local, server } = ideDirMap[ide];
+        const { local, server, extra } = ideDirMap[ide];
         dirs.push(path.join(home, local, 'extensions'));
         dirs.push(path.join(home, server, 'extensions'));
+        if (extra) {
+            for (const extraDir of extra) {
+                dirs.push(path.join(home, extraDir, 'extensions'));
+            }
+        }
     };
 
     if (platform === 'win32') {

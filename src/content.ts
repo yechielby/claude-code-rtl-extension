@@ -298,7 +298,7 @@ const PERMISSION_RTL_CSS = `
 /** JS for dynamic permission RTL detection — shared across all modes */
 const PERMISSION_RTL_JS = `
 (function() {
-    var PERM_RTL_RE = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+    var PERM_RTL_RE = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFE]/;
     var PERM_SEL = '[class*="permissionsContainer_"]';
 
     var LABEL_SEL = '[class*="optionLabel_"],[class*="optionDescription_"]';
@@ -680,7 +680,7 @@ export const PLAN_ACTIVE_JS =
 export const PLAN_AUTO_JS =
     PLAN_JS_START_MARKER + '\n' +
     `(function() {
-    var RTL_RE = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+    var RTL_RE = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFE]/;
     var content = document.getElementById('content');
     if (!content) return;
     var btn = document.createElement('button');
@@ -712,7 +712,7 @@ export const PLAN_AUTO_JS =
 export const RTL_AUTO_JS_CODE = `
 /* RTL Toggle Button - Added by script */
 (function() {
-    var RTL = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+    var RTL = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFE]/;
     var CLS = 'YBYrtl';
 
     /* Bubble selectors — Claude responses and user messages */

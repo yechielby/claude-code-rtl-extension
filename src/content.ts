@@ -212,17 +212,22 @@ const LTR_CONTENT_RULES = `
    LTR - Force left-to-right always
    ========================================== */
 
-/* Messages container */
+/* Messages container — anchor all bubbles to the left edge */
 [class*="messagesContainer_"] {
     direction: ltr;
+    align-items: flex-start !important;
 }
 
-/* User messages */
+/* User messages — pinned to the left, mirroring how RTL Always pins right */
 [class*="userMessage_"],
 [class*="userMessageContainer_"] {
     direction: ltr;
     unicode-bidi: isolate;
     text-align: left !important;
+    align-items: flex-start !important;
+    align-self: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
 }
 
 [class*="content_"][class*="xGDvVg"],

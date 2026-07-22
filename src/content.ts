@@ -16,6 +16,7 @@ export const JS_END_MARKER = '/* End RTL Toggle Button */';
 export const RTL_MODE_ACTIVE_MARKER = '/* RTL-MODE: active */';
 export const RTL_MODE_ALWAYS_MARKER = '/* RTL-MODE: always */';
 export const RTL_MODE_AUTO_MARKER = '/* RTL-MODE: auto */';
+export const RTL_MODE_LTR_MARKER = '/* RTL-MODE: ltr */';
 
 // ── CSS Building Blocks ───────────────────────────────────────────
 
@@ -202,6 +203,67 @@ ${p}[class*="thinkingContent_"] [class*="root_"] :is(ul, ol, li) {
 }
 `;
 }
+
+/** Force-LTR content rules — unprefixed (LTR Always mode).
+ *  Pins every content surface to left-to-right, overriding the webview's
+ *  auto direction detection, so Hebrew/Arabic text renders in an LTR layout. */
+const LTR_CONTENT_RULES = `
+/* ==========================================
+   LTR - Force left-to-right always
+   ========================================== */
+
+/* Messages container */
+[class*="messagesContainer_"] {
+    direction: ltr;
+}
+
+/* User messages */
+[class*="userMessage_"],
+[class*="userMessageContainer_"] {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left !important;
+}
+
+[class*="content_"][class*="xGDvVg"],
+[class*="content_"] > span {
+    unicode-bidi: isolate;
+}
+
+/* Claude's markdown responses */
+[class*="root_"] {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+[class*="root_"] > :is(p, ul, ol, h1, h2, h3, h4, blockquote),
+[class*="root_"] > :is(ul, ol) li {
+    text-align: left;
+}
+
+/* Question/answer blocks */
+[class*="questionBlock_"],
+[class*="questionHeader_"],
+[class*="answerText_"],
+[class*="optionText_"],
+[class*="optionContent_"],
+[class*="optionLabel_"],
+[class*="optionDescription_"],
+[class*="permissionsContainer_"],
+[class*="permissionRequestContent_"] {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+}
+
+/* Prompt input — force LTR instead of auto-detecting by first character */
+[class*="messageInputContainer_"] > *,
+[class*="otherInput_"] [contenteditable] {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+}
+`;
 
 /** Auto mode RTL rules — .YBYrtl is on the bubble itself, not on #root.
  *  Uses descendant selectors from the bubble, plus self-matching for the bubble element. */
@@ -469,6 +531,15 @@ export function generateAutoCssRules(fonts: FontOptions = NO_FONTS): string {
     ]);
 }
 
+/** LTR Always mode — force left-to-right everywhere, no prefix, no button */
+export function generateLtrCssRules(fonts: FontOptions = NO_FONTS): string {
+    return assembleCss(RTL_MODE_LTR_MARKER, [
+        LTR_CONTENT_RULES,
+        ltrOverrideRules(''),
+        generateFontCss(fonts),
+    ]);
+}
+
 // ── JavaScript ────────────────────────────────────────────────────
 
 /** RTL JS toggle button code */
@@ -644,6 +715,32 @@ export function generatePlanActiveCss(fonts: FontOptions = NO_FONTS): string {
 export function generatePlanAlwaysCss(fonts: FontOptions = NO_FONTS): string {
     return PLAN_CSS_START_MARKER + '\n' +
         PLAN_RTL_ALWAYS_CSS +
+        generatePlanFontCss(fonts) +
+        '\n' + PLAN_CSS_END_MARKER;
+}
+
+/** Plan Preview force-LTR rules — unscoped (LTR Always mode) */
+const PLAN_LTR_ALWAYS_CSS = `
+#content {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+}
+#content th, #content td {
+    text-align: left;
+}
+#content pre,
+#content code {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+}
+`;
+
+/** Assembled Plan Preview CSS for LTR Always mode */
+export function generatePlanLtrCss(fonts: FontOptions = NO_FONTS): string {
+    return PLAN_CSS_START_MARKER + '\n' +
+        PLAN_LTR_ALWAYS_CSS +
         generatePlanFontCss(fonts) +
         '\n' + PLAN_CSS_END_MARKER;
 }

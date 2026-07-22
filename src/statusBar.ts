@@ -27,12 +27,16 @@ export async function updateStatusBar(): Promise<void> {
 
     const statuses = await getStatus(extensions);
     const autoMode = statuses.some(s => s.mode === 'auto');
+    const ltrMode = statuses.some(s => s.mode === 'ltr');
     const alwaysMode = statuses.some(s => s.mode === 'always');
     const activeMode = statuses.some(s => s.mode === 'active');
 
     if (autoMode) {
         statusBarItem.text = '$(globe) RTL: Auto';
         statusBarItem.tooltip = 'Claude Code RTL auto-detects direction. Click to manage.';
+    } else if (ltrMode) {
+        statusBarItem.text = '$(globe) LTR: Always';
+        statusBarItem.tooltip = 'Claude Code is forced left-to-right. Click to manage.';
     } else if (alwaysMode) {
         statusBarItem.text = '$(globe) RTL: Always';
         statusBarItem.tooltip = 'Claude Code RTL is always on. Click to manage.';

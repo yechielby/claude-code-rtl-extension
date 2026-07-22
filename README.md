@@ -64,6 +64,7 @@ The original `Claude Code for VS Code` extension lacks native RTL support. This 
 | ▶️ Activate RTL | Injects CSS and a toggle button into the Claude Code chat |
 | 📌 Activate RTL (Always) | Permanently enables RTL without a toggle button |
 | 👁️ Activate RTL (Auto) | Auto-detects Hebrew/Arabic/Persian per bubble and sets direction **(Recommended)** |
+| ➡️ Force LTR (Always) | Forces left-to-right always — even for Hebrew/Arabic/Persian text |
 | 🔧 Fix BiDi | Activates RTL and fixes reversed text (e.g. "םולש" → "שלום") |
 | ⏹️ Deactivate RTL | Restores original files from backup |
 | 🔍 Check Status | Shows which installations have RTL enabled |
@@ -149,6 +150,7 @@ After installation, a status bar item appears at the bottom of VS Code:
 | `RTL: Active` ✅ | RTL is injected with toggle button |
 | `RTL: Always` 📌 | RTL is permanently on (no toggle needed) |
 | `RTL: Auto` 👁️ | RTL auto-detects per bubble **(Recommended)** |
+| `LTR: Always` ➡️ | Layout is forced left-to-right, even for RTL text |
 | `RTL: Inactive` ⭕ | RTL is not installed |
 | `RTL: N/A` ❌ | Claude Code for VS Code extension not found |
 
@@ -163,6 +165,7 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 | `Claude RTL: Activate RTL` | ▶️ Enable RTL support with toggle button |
 | `Claude RTL: Activate RTL (Always)` | 📌 Enable RTL permanently without toggle button |
 | `Claude RTL: Activate RTL (Auto)` | 👁️ Auto-detect RTL per bubble **(Recommended)** |
+| `Claude RTL: Force LTR (Always)` | ➡️ Force left-to-right always, even for RTL text |
 | `Claude RTL: Fix BiDi` | 🔧 Activate RTL + fix bidirectional text issues |
 | `Claude RTL: Deactivate RTL` | ⏹️ Disable RTL and restore original files |
 | `Claude RTL: Check Status` | 🔍 View installation status |
@@ -181,6 +184,8 @@ Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) and search for:
 **Always mode** — RTL is permanently on. No button needed — text is always right-to-left.
 
 **Auto mode** — RTL is automatically detected per chat bubble. Bubbles with Hebrew/Arabic/Persian text become RTL; English-only bubbles stay LTR. Best for mixed-language conversations.
+
+**LTR Always mode** — the opposite direction choice: the whole chat (messages, input box, Plan Preview) is pinned left-to-right, even when the conversation contains Hebrew, Arabic, or Persian text. For users who read RTL languages comfortably but prefer a stable LTR layout while coding.
 
 > 💡 **Tip (Active mode):** Not every conversation needs RTL — you can toggle it per chat session.
 > Use ⇄ only in conversations where you write in Hebrew, Arabic, or Persian.

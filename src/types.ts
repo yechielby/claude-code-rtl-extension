@@ -12,8 +12,8 @@ export interface ClaudeExtensionInfo {
     name: string;
 }
 
-/** RTL operating mode */
-export type RtlMode = 'active' | 'always' | 'auto' | 'inactive';
+/** RTL operating mode — 'ltr' forces left-to-right always, even for RTL scripts */
+export type RtlMode = 'active' | 'always' | 'auto' | 'ltr' | 'inactive';
 
 /** RTL installation status for a single extension */
 export interface RtlStatus {

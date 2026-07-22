@@ -5,14 +5,15 @@ import {
     RTL_JS_CODE,
     RTL_START_MARKER, RTL_END_MARKER,
     JS_START_MARKER, JS_END_MARKER,
-    RTL_MODE_ALWAYS_MARKER, RTL_MODE_AUTO_MARKER,
+    RTL_MODE_ALWAYS_MARKER, RTL_MODE_AUTO_MARKER, RTL_MODE_LTR_MARKER,
     RTL_AUTO_JS_CODE,
-    generateActiveCssRules, generateAlwaysCssRules, generateAutoCssRules,
+    generateActiveCssRules, generateAlwaysCssRules, generateAutoCssRules, generateLtrCssRules,
     PLAN_CSS_START_MARKER, PLAN_CSS_END_MARKER,
     PLAN_JS_START_MARKER, PLAN_JS_END_MARKER,
     generatePlanActiveCss, PLAN_ACTIVE_JS,
     generatePlanAlwaysCss,
     generatePlanAutoCss, PLAN_AUTO_JS,
+    generatePlanLtrCss,
     FontOptions,
 } from './content.js';
 
@@ -137,6 +138,18 @@ export async function isAutoMode(cssPath: string): Promise<boolean> {
     try {
         const content = await fs.readFile(cssPath, 'utf-8');
         return content.includes(RTL_MODE_AUTO_MARKER);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Check if CSS is in "ltr" mode (force left-to-right always).
+ */
+export async function isLtrMode(cssPath: string): Promise<boolean> {
+    try {
+        const content = await fs.readFile(cssPath, 'utf-8');
+        return content.includes(RTL_MODE_LTR_MARKER);
     } catch {
         return false;
     }
@@ -378,7 +391,8 @@ export async function getStatus(extensions: ClaudeExtensionInfo[]): Promise<RtlS
 
         const cssInstalled = cssContent.includes(RTL_START_MARKER);
         const autoMode = cssInstalled && cssContent.includes(RTL_MODE_AUTO_MARKER);
-        const alwaysMode = cssInstalled && !autoMode && cssContent.includes(RTL_MODE_ALWAYS_MARKER);
+        const ltrMode = cssInstalled && !autoMode && cssContent.includes(RTL_MODE_LTR_MARKER);
+        const alwaysMode = cssInstalled && !autoMode && !ltrMode && cssContent.includes(RTL_MODE_ALWAYS_MARKER);
 
         statuses.push({
             extension: ext,
@@ -387,7 +401,7 @@ export async function getStatus(extensions: ClaudeExtensionInfo[]): Promise<RtlS
             planPreviewInstalled: await isPlanPreviewInstalled(ext.extensionJsPath),
             cssBackupExists: await exists(ext.cssPath + '.bak'),
             jsBackupExists: ext.jsPath ? await exists(ext.jsPath + '.bak') : false,
-            mode: autoMode ? 'auto' : alwaysMode ? 'always' : cssInstalled ? 'active' : 'inactive',
+            mode: autoMode ? 'auto' : ltrMode ? 'ltr' : alwaysMode ? 'always' : cssInstalled ? 'active' : 'inactive',
         });
     }
 
@@ -477,13 +491,44 @@ async function addRtlAutoImpl(ext: ClaudeExtensionInfo, fonts?: FontOptions): Pr
 }
 
 /**
+ * Add "LTR Always" mode — force left-to-right everywhere, no JS button.
+ * Gives users of LTR languages a way to pin the layout even when the
+ * conversation contains Hebrew/Arabic text.
+ */
+async function addLtrAlwaysImpl(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
+    const messages: string[] = [];
+    let changed = false;
+
+    if (await injectFile(ext.cssPath, generateLtrCssRules(fonts), 'CSS', messages, { fixBidi: true })) {
+        messages.push(`  CSS: LTR Always support added to ${ext.name}`);
+        changed = true;
+    }
+
+    // Remove JS button if installed
+    if (ext.jsPath && await isJsInstalled(ext.jsPath)) {
+        if (await restoreAndDeleteBackup(ext.jsPath, 'JS', messages)) {
+            changed = true;
+        }
+    } else {
+        messages.push(`  JS:  No button to remove (LTR Always mode — no JS needed)`);
+    }
+
+    if (await injectPlanPreview(ext.extensionJsPath, generatePlanLtrCss(fonts), null, messages)) {
+        changed = true;
+    }
+
+    return { messages, changed };
+}
+
+/**
  * Add RTL support and fix BiDi issue by removing the bidi-override rule.
  * Preserves the current mode.
  */
 async function fixBidiImpl(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     const currentlyAuto = await isAutoMode(ext.cssPath);
-    const currentlyAlways = !currentlyAuto && await isAlwaysMode(ext.cssPath);
-    const result = currentlyAuto ? await addRtlAutoImpl(ext, fonts) : currentlyAlways ? await addRtlAlwaysImpl(ext, fonts) : await addRtlImpl(ext, fonts);
+    const currentlyLtr = !currentlyAuto && await isLtrMode(ext.cssPath);
+    const currentlyAlways = !currentlyAuto && !currentlyLtr && await isAlwaysMode(ext.cssPath);
+    const result = currentlyAuto ? await addRtlAutoImpl(ext, fonts) : currentlyLtr ? await addLtrAlwaysImpl(ext, fonts) : currentlyAlways ? await addRtlAlwaysImpl(ext, fonts) : await addRtlImpl(ext, fonts);
 
     // After injection, remove the bidi-override rule if still present
     try {
@@ -583,6 +628,10 @@ export function addRtlAlways(ext: ClaudeExtensionInfo, fonts?: FontOptions): Pro
 
 export function addRtlAuto(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
     return withFileLock(ext.dir, () => addRtlAutoImpl(ext, fonts));
+}
+
+export function addLtrAlways(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {
+    return withFileLock(ext.dir, () => addLtrAlwaysImpl(ext, fonts));
 }
 
 export function fixBidi(ext: ClaudeExtensionInfo, fonts?: FontOptions): Promise<InjectionResult> {

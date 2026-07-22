@@ -99,6 +99,10 @@
         "title": "Claude RTL: Activate RTL (Auto)"
       },
       {
+        "command": "claude-rtl.addLtr",
+        "title": "Claude RTL: Force LTR (Always)"
+      },
+      {
         "command": "claude-rtl.remove",
         "title": "Claude RTL: Deactivate RTL"
       },

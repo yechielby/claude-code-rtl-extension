@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **New: Force LTR (Always) mode** (`Claude RTL: Force LTR (Always)`) — pins the whole chat (messages, input box, question/permission dialogs, Plan Preview) to left-to-right, even when the conversation contains Hebrew, Arabic, or Persian text. The direction choice is now symmetric: users who want RTL pick an RTL mode, users who prefer a stable LTR layout while chatting in an RTL language pick LTR Always. Shown in the status bar as `LTR: Always` and available from the status-bar menu; survives Claude Code updates via auto-reactivate like the other modes.
+
 ## v0.4.2
 
 - **Fix file corruption with multiple IDE windows open** — Each open IDE window runs its own extension host, and they all patch the *same* Claude Code files on disk. Their backup/read/write cycles could interleave and truncate a file — in one report `webview/index.js` shrank from 4.8 MB to ~1 MB, which left the Claude panel completely blank. Injection is now:

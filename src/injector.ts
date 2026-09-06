@@ -286,13 +286,20 @@ async function injectPlanPreview(
             const readyMsg = "vscode.postMessage({ type: 'ready' })";
             const readyIdx = content.indexOf(readyMsg, newAnchorIdx);
             if (readyIdx === -1) {
-                messages.push('  Plan: Could not locate JS injection point in Plan Preview template');
-            } else {
-                content = content.substring(0, readyIdx) +
-                    jsContent + '\n      ' +
-                    content.substring(readyIdx);
-                messages.push('  Plan: RTL JS injected into Plan Preview');
+                // CSS anchor found but JS anchor missing (e.g. a Claude Code version
+                // that kept the template but changed the `ready` message). Abort rather
+                // than persist a CSS-only injection that isPlanPreviewInstalled/getStatus
+                // would then report as INSTALLED — a half-applied feature (no toggle
+                // button, no auto-detect) with no signal to the user. Nothing has been
+                // written to disk yet, so returning here leaves extension.js untouched.
+                messages.push('  Plan: Could not locate JS injection point; aborting to avoid a CSS-only partial injection');
+                return false;
             }
+
+            content = content.substring(0, readyIdx) +
+                jsContent + '\n      ' +
+                content.substring(readyIdx);
+            messages.push('  Plan: RTL JS injected into Plan Preview');
         }
 
         // Corruption guard: Plan Preview injection only inserts content, so the

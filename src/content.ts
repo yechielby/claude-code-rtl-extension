@@ -435,10 +435,27 @@ export interface FontOptions {
 export const NO_FONTS: FontOptions = { textFont: '', codeFont: '' };
 
 /** Generate font CSS for chat — applied universally (independent of RTL state). */
+/**
+ * Sanitize a user-supplied font-family name before it is interpolated into CSS.
+ *
+ * textFont/codeFont come from `claude-code-rtl.*` settings, which VS Code reads
+ * at workspace scope (a repo's .vscode/settings.json). The value is interpolated
+ * into `font-family: "${value}"` and, on the Plan Preview path, into a <style>
+ * block that lives inside Claude Code's webview HTML. Without sanitizing, a value
+ * such as `Arial"; } </style><script>...` breaks out of the string, the rule, and
+ * the <style> element. Font-family names are letters, digits, spaces and hyphens,
+ * so strip anything else. (CWE-79 / CWE-116; OWASP A03: Injection.)
+ */
+function sanitizeFontFamily(name: string): string {
+    return name.replace(/[^\w \-]/g, '').trim();
+}
+
 function generateFontCss(fonts: FontOptions): string {
     const parts: string[] = [];
+    const textFont = sanitizeFontFamily(fonts.textFont);
+    const codeFont = sanitizeFontFamily(fonts.codeFont);
 
-    if (fonts.textFont) {
+    if (textFont) {
         parts.push(`
 /* Custom text font */
 [class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) > :is(p, ul, ol, h1, h2, h3, h4, blockquote),
@@ -447,17 +464,17 @@ function generateFontCss(fonts: FontOptions): string {
 [class*="content_"],
 [class*="messageInputContainer_"] [contenteditable],
 [class*="mentionMirror_"] {
-    font-family: "${fonts.textFont}", sans-serif !important;
+    font-family: "${textFont}", sans-serif !important;
 }`);
     }
 
-    if (fonts.codeFont) {
+    if (codeFont) {
         parts.push(`
 /* Custom code font */
 pre,
 code,
 [class*="codeBlockWrapper_"] {
-    font-family: "${fonts.codeFont}", monospace !important;
+    font-family: "${codeFont}", monospace !important;
 }
 
 /* Diff editor — Monaco sets font-family as inline style, needs !important */
@@ -466,7 +483,7 @@ code,
 [class*="diffEditorWrapper_"] .margin-view-overlays,
 [class*="diffEditorWrapper_"] .cursor,
 [class*="diffEditorWrapper_"] .inputarea {
-    font-family: "${fonts.codeFont}", monospace !important;
+    font-family: "${codeFont}", monospace !important;
 }`);
     }
 
@@ -476,19 +493,21 @@ code,
 /** Generate font CSS for Plan Preview — scoped to #content (independent of RTL state). */
 function generatePlanFontCss(fonts: FontOptions): string {
     const parts: string[] = [];
+    const textFont = sanitizeFontFamily(fonts.textFont);
+    const codeFont = sanitizeFontFamily(fonts.codeFont);
 
-    if (fonts.textFont) {
+    if (textFont) {
         parts.push(`
 #content {
-    font-family: "${fonts.textFont}", sans-serif !important;
+    font-family: "${textFont}", sans-serif !important;
 }`);
     }
 
-    if (fonts.codeFont) {
+    if (codeFont) {
         parts.push(`
 #content pre,
 #content code {
-    font-family: "${fonts.codeFont}", monospace !important;
+    font-family: "${codeFont}", monospace !important;
 }`);
     }
 

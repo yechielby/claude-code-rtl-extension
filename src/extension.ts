@@ -67,8 +67,14 @@ async function handleMode(
 
     if (anyChanged) {
         vscode.commands.executeCommand('workbench.action.reloadWindow');
-    } else if (noChangeMessage) {
-        vscode.window.showInformationMessage(noChangeMessage);
+    } else {
+        if (noChangeMessage) {
+            vscode.window.showInformationMessage(noChangeMessage);
+        }
+        // No files changed, so no window reload runs to re-run activation and
+        // refresh the status bar. saveMode() above already persisted the new mode,
+        // so refresh the indicator here to keep it in sync with the saved mode.
+        await updateStatusBar();
     }
 }
 
